@@ -2,41 +2,89 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white_smoke"
+
         android:orientation="vertical">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="@color/white">
+            android:background="@color/dark_blue">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:src="@color/white_smoke" />
+                android:id="@+id/circleImageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/icon"
+                app:civ_border_color="@color/white"
+                app:civ_border_width="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="USER SETTTING" />
+                android:id="@+id/tv_ho_ten"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Bùi Minh Tâm"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.501"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/circleImageView" />
+
+            <TextView
+                android:id="@+id/tv_sdt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:text="0968183101"
+                android:textColor="@color/ghost_white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.501"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_ho_ten" />
+
+            <TextView
+                android:id="@+id/tv_dia_chi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:text="Ninh Kiều, Cần Thơ"
+                android:textColor="@color/ghost_white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.501"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_sdt" />
+
+
         </android.support.constraint.ConstraintLayout>
 
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="1dp"
             android:background="@color/white">
 
 
             <TextView
-                android:id="@+id/tv_giohang"
+                android:id="@+id/tv_don_hang_dag_xu_ly"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginStart="0dp"
@@ -58,9 +106,9 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:src="@drawable/ic_local_grocery_store_white_smoke_24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/tv_giohang"
-                app:layout_constraintStart_toStartOf="@+id/tv_giohang"
-                app:layout_constraintTop_toTopOf="@+id/tv_giohang" />
+                app:layout_constraintBottom_toBottomOf="@+id/tv_don_hang_dag_xu_ly"
+                app:layout_constraintStart_toStartOf="@+id/tv_don_hang_dag_xu_ly"
+                app:layout_constraintTop_toTopOf="@+id/tv_don_hang_dag_xu_ly" />
 
 
             <TextView
@@ -76,7 +124,7 @@
                 android:paddingStart="72dp"
                 android:text="Lịch sử đặt hàng"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_giohang" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_don_hang_dag_xu_ly" />
 
             <ImageView
                 android:layout_width="24dp"
@@ -91,14 +139,14 @@
 
 
             <TextView
-                android:background="@drawable/button_backround_user"
-                android:clickable="true"
-                android:focusable="true"
                 android:id="@+id/tv_caidat"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
+                android:background="@drawable/button_backround_user"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:paddingStart="72dp"
                 android:text="Cài đặt tài khoản"
@@ -118,14 +166,14 @@
 
 
             <TextView
-                android:background="@drawable/button_backround_user"
-                android:clickable="true"
-                android:focusable="true"
                 android:id="@+id/tv_dangxuat"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
+                android:background="@drawable/button_backround_user"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:paddingStart="72dp"
                 android:text="Đăng xuất"
@@ -180,7 +228,34 @@
                 app:layout_constraintTop_toTopOf="@+id/tv_phanhoi" />
 
 
+            <TextView
+                android:id="@+id/tv_about"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="1dp"
+                android:background="@drawable/button_backround_user"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingStart="72dp"
+                android:text="Thông tin phần mềm"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_phanhoi" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_info_black_24dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_about"
+                app:layout_constraintStart_toStartOf="@+id/tv_about"
+                app:layout_constraintTop_toTopOf="@+id/tv_about" />
+
         </android.support.constraint.ConstraintLayout>
+
 
     </LinearLayout>
 

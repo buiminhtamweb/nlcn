@@ -1,6 +1,7 @@
 package mycompany.com.nlcn.Data;
 
 import android.content.Context;
+import android.util.Log;
 
 import mycompany.com.nlcn.Constant;
 import okhttp3.OkHttpClient;
@@ -27,6 +28,7 @@ public class ConnectServer {
     public static ConnectServer getInstance(Context context) {
 
         if (mConnectServer == null) {
+            Log.e("SV", "getInstance: new ConnectServer "  );
             mConnectServer = new ConnectServer(context);
         }
         return mConnectServer;

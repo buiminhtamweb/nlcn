@@ -14,16 +14,16 @@
 //import java.util.List;
 //
 //import mycompany.com.nlcn.Constant;
-//import mycompany.com.nlcn.Model.Sanpham;
+//import mycompany.com.nlcn.Model.ItemSanpham;
 //import mycompany.com.nlcn.R;
 //
 //public class SPDonHangRecyclerViewAdapter extends RecyclerView.Adapter<SPDonHangRecyclerViewAdapter.Holder> {
 //    private Context mContext;
 //    private onClickListener onClickListener;
-//    private List<Sanpham> mSanPhams;
+//    private List<ItemSanpham> mSanPhams;
 //
 //
-//    public SPDonHangRecyclerViewAdapter(Context mContext, List<Sanpham> mSanPhams) {
+//    public SPDonHangRecyclerViewAdapter(Context mContext, List<ItemSanpham> mSanPhams) {
 //        this.mContext = mContext;
 //        this.mSanPhams = mSanPhams;
 //    }

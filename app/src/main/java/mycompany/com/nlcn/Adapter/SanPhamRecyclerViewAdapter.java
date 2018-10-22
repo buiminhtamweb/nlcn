@@ -15,17 +15,17 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import mycompany.com.nlcn.Constant;
-import mycompany.com.nlcn.Model.Sanpham;
+import mycompany.com.nlcn.Model.ItemSanpham;
 import mycompany.com.nlcn.R;
 
 public class SanPhamRecyclerViewAdapter extends RecyclerView.Adapter<SanPhamRecyclerViewAdapter.Holder> {
     private Context mContext;
     private onClickListener onClickListener;
     private onScrollListener onScrollListener;
-    private List<Sanpham> mSanPhams;
+    private List<ItemSanpham> mSanPhams;
 
 
-    public SanPhamRecyclerViewAdapter(Context mContext, List<Sanpham> mSanPhams) {
+    public SanPhamRecyclerViewAdapter(Context mContext, List<ItemSanpham> mSanPhams) {
         this.mContext = mContext;
         this.mSanPhams = mSanPhams;
     }

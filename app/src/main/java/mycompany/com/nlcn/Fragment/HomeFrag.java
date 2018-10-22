@@ -27,7 +27,7 @@ import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.MainActivity;
 import mycompany.com.nlcn.Model.DataSanPham;
 import mycompany.com.nlcn.Model.Message;
-import mycompany.com.nlcn.Model.Sanpham;
+import mycompany.com.nlcn.Model.ItemSanpham;
 import mycompany.com.nlcn.R;
 import mycompany.com.nlcn.utils.SharedPreferencesHandler;
 import retrofit2.Call;
@@ -37,8 +37,7 @@ import retrofit2.Response;
 public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onScrollListener, SanPhamRecyclerViewAdapter.onClickListener {
     private RecyclerView mRecyclerView;
     private SanPhamRecyclerViewAdapter mSanPhamRecyclerViewAdapter;
-    private List<Sanpham> mSanPhams = new ArrayList<>();
-    private ConnectServer mConnectServer;
+    private List<ItemSanpham> mSanPhams = new ArrayList<>();
     private int mPageCurrent;
     private int mNumPage;
     private API mApi;
@@ -63,8 +62,7 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mSanPhamRecyclerViewAdapter);
 
-        mConnectServer = ConnectServer.getInstance(getContext());
-        mApi = mConnectServer.CreateApi();
+        mApi = ConnectServer.getInstance(getContext()).CreateApi();
         layDSSanPham(1);
 
         return v;
@@ -81,11 +79,12 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
                     mPageCurrent = Integer.parseInt(response.body().getPage());
                     mNumPage = response.body().getNumpages();
 
-                    for (Sanpham sp : response.body().getSanphams()) {
+                    for (ItemSanpham sp : response.body().getItemSanphams()) {
                         if (sp.getId() != null) mSanPhams.add(sp);
 
                     }
                     mSanPhamRecyclerViewAdapter.notifyDataSetChanged();
+                    Log.e("HOME_FRAG", "onResponse: Succ" );
                 }
 
 

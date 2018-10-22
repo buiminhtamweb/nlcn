@@ -3,11 +3,15 @@ package mycompany.com.nlcn.Data;
 import java.util.List;
 
 import mycompany.com.nlcn.Model.ChiTietSanPham;
+import mycompany.com.nlcn.Model.DSDonHang;
 import mycompany.com.nlcn.Model.DataSanPham;
 import mycompany.com.nlcn.Model.DonHang;
+import mycompany.com.nlcn.Model.DonHangRes;
+import mycompany.com.nlcn.Model.ItemSPDonHang;
 import mycompany.com.nlcn.Model.Message;
 import mycompany.com.nlcn.Model.ResLogin;
 import mycompany.com.nlcn.Model.SPGioHang;
+import mycompany.com.nlcn.Model.UserAcc;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -32,8 +36,11 @@ public interface API {
     //Tài khoản người dùng
     @FormUrlEncoded
     @POST("signup")
-    Call<Message> registerAcc(@Field("name") String name, @Field("username") String username, @Field("password") String password,
-                             @Field("email") String email);
+    Call<Message> registerAcc(@Field("name") String name,
+                              @Field("username") String username,
+                              @Field("password") String password,
+                              @Field("sdt") String sdt,
+                              @Field("diachi") String diachi);
 
     @FormUrlEncoded
     @POST("login")
@@ -43,11 +50,14 @@ public interface API {
     Call<Message> kiemTraTrangThaiDangNhap();
 
     @GET("user")
-    Call<?> layThongTin(@Query("idNguoiDung") String idNguoiDung);
+    Call<UserAcc> layThongTinNguoiDung(@Query("idNguoiDung") String idNguoiDung);
 
     @FormUrlEncoded
     @PUT("user")
-    Call<?> capNhatThongTin(@Field("idNguoiDung") String idNguoiDung);
+    Call<Message> capNhatThongTinNguoiDung(@Field("idNguoiDung") String idNguoiDung);
+
+    @POST("logout")
+    Call<Message> dangXuat();
 
 
 
@@ -77,15 +87,13 @@ public interface API {
     Call<Message> datHang(@Body DonHang donHang);
 
     @GET("dsdonhang")
-    Call<?> layDSDonHang(@Query("idNguoiMua") String idNguoiMua, @Query("daDuyet") Boolean daDuyet, @Query("page") int page);
+    Call<DSDonHang> layDSDonHang(@Query("idNguoiMua") String idNguoiMua, @Query("daDuyet") Boolean daDuyet, @Query("page") int page);
 
     @GET("donhang")
-    Call<?> layChiTietDonHang(@Query("idDonHang") String idDonHang);
+    Call<DonHangRes> layChiTietDonHang(@Query("idDonHang") String idDonHang);
 
     @GET("itemspdonhang")
-    Call<?> layItemSPDonHang(@Query("idSP") String idSP);
-
-
+    Call<ItemSPDonHang> layItemSPDonHang(@Query("idSP") String idSP);
 
 
 

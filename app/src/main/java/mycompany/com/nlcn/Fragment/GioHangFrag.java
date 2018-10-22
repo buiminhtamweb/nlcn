@@ -245,6 +245,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
 
 
     private void datHang(){
+        if(mGioHang.size()>0){
         List<SpMua> spMuas = new ArrayList<>();
         for (SPGioHang sp : mGioHang) {
             SpMua spMua = new SpMua();
@@ -252,6 +253,9 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
             spMua.setSanLuongMua(sp.getSanLuongMua());
             spMua.setGiaMua(sp.getGiasp());
             spMuas.add(spMua);
+
+
+
         }
         DonHang donHang = new DonHang();
         donHang.setIdNguoiMua(idNguoiDung);
@@ -283,5 +287,9 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
 
             }
         });
+
+        }else {
+            viewError("Giỏ hàng rỗng !");
+        }
     }
 }

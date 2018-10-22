@@ -3,6 +3,7 @@ package mycompany.com.nlcn.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -18,29 +19,42 @@ import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText mName, mUserName, mPassword, mConfirmPassword, mEmail;
-//    private ConnectServer mConnectServer;
+    private EditText mName, mUserName, mPassword, mConfirmPassword, mSDT, mDiaChi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finish();
+                }
+            });
+        }
+
         mName = (EditText) findViewById(R.id.edt_name);
         mUserName = (EditText) findViewById(R.id.edt_username);
         mPassword = (EditText) findViewById(R.id.edt_password);
         mConfirmPassword = (EditText) findViewById(R.id.edt_confirmpassword);
-        mEmail = (EditText) findViewById(R.id.edt_email);
+        mSDT = (EditText) findViewById(R.id.edt_sdt);
+        mDiaChi = (EditText) findViewById(R.id.edt_dia_chi);
 
 
     }
 
     public void register(View view) {
         if (checkEditText()) {
-            Call<mycompany.com.nlcn.Model.Message> call = ConnectServer.getInstance(this).CreateApi().registerAcc(mName.getText().toString(),
+            Call<Message> call = ConnectServer.getInstance(this).CreateApi().registerAcc(mName.getText().toString(),
                     mUserName.getText().toString(),
                     mPassword.getText().toString(),
-                    mEmail.getText().toString());
+                    mSDT.getText().toString(),
+                    mDiaChi.getText().toString());
 
             call.enqueue(new Callback<Message>() {
                 @Override
@@ -69,9 +83,11 @@ public class RegisterActivity extends AppCompatActivity {
             mName.setError("Chua nhap ten");
         } else if (mUserName.getText().toString().equals("")) {
             mUserName.setError("Chua nhap Username");
-        } else if (mEmail.getText().toString().equals("")) {
-            mEmail.setError("Email chua nhap");
-        } else if (mPassword.getText().toString().length() < 7) {
+        } else if (mSDT.getText().toString().equals("")) {
+            mSDT.setError("Email chua nhap");
+        } else if (mDiaChi.getText().toString().equals("")) {
+            mDiaChi.setError("Địa chỉ chưa nhập");
+        }        else if (mPassword.getText().toString().length() < 7) {
             mPassword.setError("Do dai mat khau phai tren 7 ky tu");
         } else if (!mPassword.getText().toString().equals(mConfirmPassword.getText().toString())) {
             mConfirmPassword.setError("Nhap lai mat khau chua dung");
@@ -83,6 +99,5 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        ConnectServer.destroy();
     }
 }

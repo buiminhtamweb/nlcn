@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class DataSanPham {
+public class DSDonHang {
 
     @SerializedName("page")
     @Expose
@@ -13,9 +13,9 @@ public class DataSanPham {
     @SerializedName("numpages")
     @Expose
     private Integer numpages;
-    @SerializedName("sanphams")
+    @SerializedName("donhangs")
     @Expose
-    private List<ItemSanpham> itemSanphams = null;
+    private List<ItemDonhang> donhangs = null;
 
     public String getPage() {
         return page;
@@ -33,12 +33,12 @@ public class DataSanPham {
         this.numpages = numpages;
     }
 
-    public List<ItemSanpham> getItemSanphams() {
-        return itemSanphams;
+    public List<ItemDonhang> getDonhangs() {
+        return donhangs;
     }
 
-    public void setItemSanphams(List<ItemSanpham> itemSanphams) {
-        this.itemSanphams = itemSanphams;
+    public void setDonhangs(List<ItemDonhang> donhangs) {
+        this.donhangs = donhangs;
     }
 
 }
