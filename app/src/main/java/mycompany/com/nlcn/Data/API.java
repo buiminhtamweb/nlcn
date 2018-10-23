@@ -54,7 +54,15 @@ public interface API {
 
     @FormUrlEncoded
     @PUT("user")
-    Call<Message> capNhatThongTinNguoiDung(@Field("idNguoiDung") String idNguoiDung);
+    Call<Message> capNhatThongTinNguoiDung(@Field("idNguoiDung") String idNguoiDung,
+                                           @Field("type") int type,
+                                           @Field("data") String data);
+
+    @FormUrlEncoded
+    @PUT("user")
+    Call<Message> capNhatMatKhau(@Field("idNguoiDung") String idNguoiDung,
+                                           @Field("matKhauCu") String matKhauCu,
+                                           @Field("matKhauMoi") String matKhauMoi);
 
     @POST("logout")
     Call<Message> dangXuat();

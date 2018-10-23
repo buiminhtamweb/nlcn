@@ -23,13 +23,14 @@ import mycompany.com.nlcn.MainActivity;
 import mycompany.com.nlcn.Model.ChiTietSanPham;
 import mycompany.com.nlcn.Model.Message;
 import mycompany.com.nlcn.R;
+import mycompany.com.nlcn.utils.SharedPreferencesHandler;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ChiTietSPActivity extends AppCompatActivity {
 
-    String idNguoiDung = "5bbc731072b68a180cd61ff2";
+    String idNguoiDung = "";
     private String mIdSP;
     private ImageView mImageView;
     private TextView mTenSanPham, mGiaSanPham, mSanLuongSP, mChiTietSP;
@@ -44,6 +45,8 @@ public class ChiTietSPActivity extends AppCompatActivity {
         if (null != intent) {
             mIdSP = intent.getExtras().getString("idSP", "");
         } else finish();
+
+        idNguoiDung = SharedPreferencesHandler.getString(this, "id");
 
         mImageView = (ImageView) findViewById(R.id.img_agri);
         mTenSanPham = (TextView) findViewById(R.id.tv_ten_ns);
@@ -165,17 +168,17 @@ public class ChiTietSPActivity extends AppCompatActivity {
     }
 
     private void viewSucc(View view, String message) {
-           Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
 
-           snackbar.setAction("Đi đến giỏ hàng", new View.OnClickListener() {
-               @Override
-               public void onClick(View view) {
-                   Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                   intent.putExtra("position", 1);
-                   startActivity(intent);
-                   finish();
-               }
-           });
-           snackbar.show();
+        snackbar.setAction("Đi đến giỏ hàng", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                intent.putExtra("position", 1);
+                startActivity(intent);
+                finish();
+            }
+        });
+        snackbar.show();
     }
 }

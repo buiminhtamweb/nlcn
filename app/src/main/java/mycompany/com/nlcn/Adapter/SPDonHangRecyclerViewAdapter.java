@@ -42,7 +42,7 @@
 //    public void onBindViewHolder(@NonNull Holder holder, int position) {
 //        Picasso.get().load(Constant.URL_SERVER + mSanPhams.get(position).getImgurl()).fit().centerCrop().into(holder.mImageView);
 //        holder.mNameAgri.setText(mSanPhams.get(position).getTensp());
-//        holder.mPrice.setText(mSanPhams.get(position).getGiasp() + " VND");
+//        holder.tongTien.setText(mSanPhams.get(position).getGiasp() + " VND");
 //        holder.mSanLuong.setText(mSanPhams.get(position).getSanluong() + " Gam");
 //
 //    }
@@ -65,14 +65,14 @@
 //        ImageView mImageView;
 //        TextView mNameAgri;
 //        TextView mSanLuong;
-//        TextView mPrice;
+//        TextView tongTien;
 //
 //        public Holder(View view) {
 //            super(view);
 //            mImageView = (ImageView) view.findViewById(R.id.imageView);
 //            mNameAgri = (TextView) view.findViewById(R.id.textView_tensp);
 //            mSanLuong = (TextView) view.findViewById(R.id.textView_giasp);
-//            mPrice = (TextView) view.findViewById(R.id.textView_sanluong);
+//            tongTien = (TextView) view.findViewById(R.id.textView_sanluong);
 //
 //            view.setOnClickListener(new View.OnClickListener() {
 //                @Override

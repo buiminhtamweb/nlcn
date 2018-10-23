@@ -52,12 +52,10 @@ public class LoginActivity extends AppCompatActivity {
 
         if (checkNullDangNhap()) {
 
-
             Call<ResLogin> call = ConnectServer.getInstance(mContext).CreateApi().signInAcc(mEdtUserName.getText().toString(), mEdtPassword.getText().toString());
             call.enqueue(new Callback<ResLogin>() {
                 @Override
                 public void onResponse(Call<ResLogin> call, Response<ResLogin> response) {
-
 
                     try {
                         if (response.body().getSERVERRESPONSE() == 1) {
@@ -80,13 +78,11 @@ public class LoginActivity extends AppCompatActivity {
 
                             viewError(response.body().getSERVERMESSAGE());
 
-//                        Toast.makeText(mContext, response.body().getSERVERMESSAGE(), Toast.LENGTH_SHORT).show();
                             v.setEnabled(true);
                         }
                     } catch (NullPointerException e) {
                         Log.e("TAG", "onResponse: " + "response null");
                     }
-
 
                 }
 
@@ -95,7 +91,6 @@ public class LoginActivity extends AppCompatActivity {
                     viewError("Lỗi không thể kết nối đến máy chủ !");
                 }
             });
-
         }
     }
 

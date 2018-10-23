@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -10,7 +9,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/textView_tensp"
+            android:id="@+id/textView_id_don_hang"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -24,7 +23,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:textColor="@color/red"
             android:id="@+id/textView_tonggia"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -32,12 +30,13 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="Tổng giá:"
+            android:textColor="@color/red"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView_tensp" />
+            app:layout_constraintTop_toBottomOf="@id/textView_id_don_hang" />
 
         <TextView
-            android:id="@+id/textView_soluong_sp"
+            android:id="@+id/textView_so_luong_sp_mua"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -47,23 +46,22 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView_tonggia" />
+
         <TextView
-            android:id="@+id/textView_ngaymua"
+            android:id="@+id/textView_ngay_mua"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             android:text="Ngày mua: "
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_soluong_sp" />
+            app:layout_constraintTop_toBottomOf="@+id/textView_so_luong_sp_mua" />
 
 
     </android.support.constraint.ConstraintLayout>
-
-
 
 
 </android.support.v7.widget.CardView>

@@ -19,6 +19,19 @@ public class ItemDonhang {
     @Expose
     private Integer tongTien;
 
+    @SerializedName("soluongspmua")
+    @Expose
+    private Integer soluongspmua;
+
+
+    public Integer getSoluongspmua() {
+        return soluongspmua;
+    }
+
+    public void setSoluongspmua(Integer soluongspmua) {
+        this.soluongspmua = soluongspmua;
+    }
+
     public String getId() {
         return id;
     }

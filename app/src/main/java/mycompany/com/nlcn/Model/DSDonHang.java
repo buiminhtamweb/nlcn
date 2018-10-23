@@ -1,9 +1,9 @@
-
 package mycompany.com.nlcn.Model;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 public class DSDonHang {
 
@@ -12,6 +12,7 @@ public class DSDonHang {
     private String page;
     @SerializedName("numpages")
     @Expose
+
     private Integer numpages;
     @SerializedName("donhangs")
     @Expose
