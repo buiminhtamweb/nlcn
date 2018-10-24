@@ -21,13 +21,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mycompany.com.nlcn.Activity.ChiTietSPActivity;
+import mycompany.com.nlcn.Activity.LoginActivity;
 import mycompany.com.nlcn.Adapter.SanPhamRecyclerViewAdapter;
+import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Data.API;
 import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.MainActivity;
 import mycompany.com.nlcn.Model.DataSanPham;
-import mycompany.com.nlcn.Model.Message;
 import mycompany.com.nlcn.Model.ItemSanpham;
+import mycompany.com.nlcn.Model.Message;
 import mycompany.com.nlcn.R;
 import mycompany.com.nlcn.utils.SharedPreferencesHandler;
 import retrofit2.Call;
@@ -42,7 +44,9 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
     private int mNumPage;
     private API mApi;
     private AlertDialog mAlertDialog;
-    private String idNguoiDung = "5bbc731072b68a180cd61ff2";
+    private String idNguoiDung = "";
+
+    private String mCookies;
 
 
     @Nullable
@@ -50,7 +54,8 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.frag_home, container, false);
 
-        idNguoiDung = SharedPreferencesHandler.getString(getActivity(),"id");
+        mCookies = SharedPreferencesHandler.getString(getActivity(), Constant.PREF_COOKIES);
+        idNguoiDung = SharedPreferencesHandler.getString(getActivity(), "id");
 
         mRecyclerView = v.findViewById(R.id.recyclerview);
 
@@ -62,7 +67,8 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mSanPhamRecyclerViewAdapter);
 
-        mApi = ConnectServer.getInstance(getContext()).CreateApi();
+        mApi = ConnectServer.getInstance(getContext()).getApi();
+
         layDSSanPham(1);
 
         return v;
@@ -84,7 +90,7 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
 
                     }
                     mSanPhamRecyclerViewAdapter.notifyDataSetChanged();
-                    Log.e("HOME_FRAG", "onResponse: Succ" );
+                    Log.e("HOME_FRAG", "onResponse: Succ");
                 }
 
 
@@ -92,7 +98,8 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
 
             @Override
             public void onFailure(Call<DataSanPham> call, Throwable t) {
-                Log.e("HOME_FRAG", "onFailure: "+ t.getMessage() );
+                Log.e("HOME_FRAG", "onFailure: " + t.getMessage());
+                viewError("Lỗi kết nối đến máy chủ!");
             }
         });
 
@@ -120,7 +127,6 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
         themVaoGioHang(idSanPham);
     }
 
-
     private void themVaoGioHang(final String mIdSP) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = this.getLayoutInflater();
@@ -142,24 +148,37 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
 
                 int sanLuongMua = Integer.parseInt(edtSanLuong.getText().toString());
                 ConnectServer.getInstance(getActivity())
-                        .CreateApi()
-                        .themSPVaoGioHang(mIdSP, idNguoiDung, sanLuongMua)
+                        .getApi()
+                        .themSPVaoGioHang(mCookies, mIdSP, idNguoiDung, sanLuongMua)
                         .enqueue(new Callback<Message>() {
                             @Override
                             public void onResponse(Call<Message> call, Response<Message> response) {
+                                mAlertDialog.dismiss();
+                                try {
+                                    if (response.code() == 401) {
+                                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                                        intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                                        startActivity(intent);
+                                        getActivity().finish();
+                                    }
+                                    if (response.code() == 200 && null != response.body()) {
+                                        viewSucc(mRecyclerView, response.errorBody().string());
+                                    }
+                                    if (response.code() == 400 && null != response.errorBody()) {
+                                        String err = "";
+                                        err += response.errorBody().string();
+                                        viewError(err);
+                                    }
 
-                                if (null != response.body()) {
-                                    if (response.body().getMessage().equals("successful")) {
-                                        mAlertDialog.dismiss();
-                                        viewSucc(mRecyclerView, "Đã đặt hàng thành công");
-                                    } else
-                                        viewError(mRecyclerView, response.body().getMessage());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<Message> call, Throwable t) {
-
+                                mAlertDialog.dismiss();
+                                viewError("Lỗi kết nối đến máy chủ!");
                             }
                         });
             }
@@ -170,8 +189,8 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
         mAlertDialog.show();
     }
 
-    private void viewError(View view, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+    private void viewError(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Cảnh báo");
         builder.setMessage(message);
         builder.setCancelable(false);

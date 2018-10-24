@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.MainActivity;
 import mycompany.com.nlcn.Model.Message;
@@ -33,6 +34,8 @@ public class LoginActivity extends AppCompatActivity {
     private AlertDialog mAlertDialog;
     private Snackbar mSnackbar;
 
+    private String mCookies = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +44,8 @@ public class LoginActivity extends AppCompatActivity {
         mEdtPassword = (EditText) findViewById(R.id.pswd);
         mCBRememberMe = (CheckBox) findViewById(R.id.cb_remember);
         mContext = this.getApplicationContext();
+
+        mCookies = SharedPreferencesHandler.getString(mContext,Constant.PREF_COOKIES);
 
         mEdtUserName.setText(SharedPreferencesHandler.getString(mContext, "username"));
         mEdtPassword.setText(SharedPreferencesHandler.getString(mContext, "password"));
@@ -52,7 +57,10 @@ public class LoginActivity extends AppCompatActivity {
 
         if (checkNullDangNhap()) {
 
-            Call<ResLogin> call = ConnectServer.getInstance(mContext).CreateApi().signInAcc(mEdtUserName.getText().toString(), mEdtPassword.getText().toString());
+            Call<ResLogin> call = ConnectServer.getInstance(mContext).getApi().signInAcc(mCookies,
+                    mEdtUserName.getText().toString(),
+                    mEdtPassword.getText().toString());
+
             call.enqueue(new Callback<ResLogin>() {
                 @Override
                 public void onResponse(Call<ResLogin> call, Response<ResLogin> response) {
@@ -69,6 +77,12 @@ public class LoginActivity extends AppCompatActivity {
                             }
 
 //                        Toast.makeText(mContext, response.body().getSERVERMESSAGE(), Toast.LENGTH_SHORT).show();
+
+                            Log.e("LOGIN", "onResponse: COOKIE: " + response.headers().get("Set-Cookie") );
+
+
+                            SharedPreferencesHandler.writeString(mContext, Constant.PREF_COOKIES, response.headers().get("Set-Cookie"));
+
                             viewSucc(mCBRememberMe, "Đã đăng nhập thành công");
                             SharedPreferencesHandler.writeString(mContext, "id", response.body().getID());
                             Intent i = new Intent(mContext, MainActivity.class);
@@ -98,18 +112,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(new Intent(this, RegisterActivity.class));
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Bundle bundle = getIntent().getExtras();
-        if (null != bundle) {
-            String messsage = bundle.getString("message", null);
-            viewError(messsage);
-        } else if (SharedPreferencesHandler.getBoolean(mContext, "remember_me")) {
-            kiemTraDangNhap();
-        }
 
-    }
 
     private void viewError(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -152,7 +155,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void kiemTraDangNhap() {
-        ConnectServer.getInstance(getApplicationContext()).CreateApi().kiemTraTrangThaiDangNhap().enqueue(new Callback<Message>() {
+
+
+        ConnectServer.getInstance(getApplicationContext()).getApi().kiemTraTrangThaiDangNhap(mCookies).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
                 Log.e("TAG", "onResponse: " + response.code());
@@ -179,6 +184,20 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Bundle bundle = getIntent().getExtras();
+        if (null != bundle) {
+            String messsage = bundle.getString("message", null);
+            viewError(messsage);
+        } else if (SharedPreferencesHandler.getBoolean(mContext, "remember_me")) {
+            kiemTraDangNhap();
+        }
+
+    }
+
 
     @Override
     protected void onStop() {

@@ -1,4 +1,3 @@
-
 package mycompany.com.nlcn.Model;
 
 import com.google.gson.annotations.Expose;
@@ -23,6 +22,17 @@ public class ItemDonhang {
     @Expose
     private Integer soluongspmua;
 
+    @SerializedName("ngayDuyetDH")
+    @Expose
+    private String ngayDuyetDH;
+
+    public String getNgayDuyetDH() {
+        return ngayDuyetDH;
+    }
+
+    public void setNgayDuyetDH(String ngayDuyetDH) {
+        this.ngayDuyetDH = ngayDuyetDH;
+    }
 
     public Integer getSoluongspmua() {
         return soluongspmua;

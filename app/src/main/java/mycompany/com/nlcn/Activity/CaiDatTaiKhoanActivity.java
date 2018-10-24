@@ -44,6 +44,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
     private Button mBtnHoTen, mBtnDoiMK, mBtnNamSinh, mBtnGioiTinh, mBtnSDT, mBtnDiaChi;
 
     private String mIdNguoiDung;
+    private String mCookies;
 
 
     @Override
@@ -70,6 +71,8 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         mBtnGioiTinh = (Button) findViewById(R.id.btn_td_gioitinh);
         mBtnSDT = (Button) findViewById(R.id.btn_td_sdt);
         mBtnDiaChi = (Button) findViewById(R.id.btn_td_diachi);
+
+        mCookies = SharedPreferencesHandler.getString(this,Constant.PREF_COOKIES);
 
         eventClick();
         loadData();
@@ -293,7 +296,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         mIdNguoiDung = SharedPreferencesHandler.getString(this, "id");
 
         //Lấy thông tin từ Server
-        ConnectServer.getInstance(this).CreateApi().layThongTinNguoiDung(mIdNguoiDung).enqueue(new Callback<UserAcc>() {
+        ConnectServer.getInstance(this).getApi().layThongTinNguoiDung(mCookies,mIdNguoiDung).enqueue(new Callback<UserAcc>() {
             @Override
             public void onResponse(Call<UserAcc> call, Response<UserAcc> response) {
 
@@ -319,7 +322,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
     private void updateUser(int type, String data) {
 
-        ConnectServer.getInstance(this).CreateApi().capNhatThongTinNguoiDung(mIdNguoiDung, type, data).enqueue(new Callback<Message>() {
+        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mCookies,mIdNguoiDung, type, data).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
                 if(response.isSuccessful() && response.code()==200){
@@ -340,7 +343,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
     }
 
     private void changePassWd(String oldPass, String newConfirmPass) {
-        ConnectServer.getInstance(this).CreateApi().capNhatMatKhau(mIdNguoiDung, oldPass, newConfirmPass).enqueue(new Callback<Message>() {
+        ConnectServer.getInstance(this).getApi().capNhatMatKhau(mCookies,mIdNguoiDung, oldPass, newConfirmPass).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
                 if(response.isSuccessful() && response.code()==200){
@@ -388,4 +391,9 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         snackbar.show();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

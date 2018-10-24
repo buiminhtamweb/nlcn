@@ -29,8 +29,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mToolbar = findViewById(R.id.toolbar);
-        mToolbar.setTitle("Trang chủ");
+        //
+//        mToolbar = findViewById(R.id.toolbar);
+//        mToolbar.setTitle("Trang chủ");
 
         mBottomNavigation = (BottomNavigationView) findViewById(R.id.navigation);
         mViewPager = (ViewPager) findViewById(R.id.viewpager);

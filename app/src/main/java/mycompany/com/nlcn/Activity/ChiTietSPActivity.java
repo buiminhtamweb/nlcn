@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import mycompany.com.nlcn.Constant;
+import mycompany.com.nlcn.Data.API;
 import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.MainActivity;
 import mycompany.com.nlcn.Model.ChiTietSanPham;
@@ -35,7 +37,8 @@ public class ChiTietSPActivity extends AppCompatActivity {
     private ImageView mImageView;
     private TextView mTenSanPham, mGiaSanPham, mSanLuongSP, mChiTietSP;
     private AlertDialog alertDialog = null;
-
+    private AlertDialog mAlertDialog;
+    private String mCookies;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +48,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
         if (null != intent) {
             mIdSP = intent.getExtras().getString("idSP", "");
         } else finish();
-
+        mCookies = SharedPreferencesHandler.getString(getBaseContext(),Constant.PREF_COOKIES);
         idNguoiDung = SharedPreferencesHandler.getString(this, "id");
 
         mImageView = (ImageView) findViewById(R.id.img_agri);
@@ -66,7 +69,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
             });
         }
 
-        ConnectServer.getInstance(getApplicationContext()).CreateApi().getChiTietSanPham(mIdSP).enqueue(new Callback<ChiTietSanPham>() {
+        ConnectServer.getInstance(getApplicationContext()).getApi().getChiTietSanPham(mIdSP).enqueue(new Callback<ChiTietSanPham>() {
             @Override
             public void onResponse(Call<ChiTietSanPham> call, Response<ChiTietSanPham> response) {
 
@@ -122,38 +125,50 @@ public class ChiTietSPActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 int sanLuongMua = Integer.parseInt(edtSanLuong.getText().toString());
-                ConnectServer.getInstance(getApplicationContext())
-                        .CreateApi()
-                        .themSPVaoGioHang(mIdSP, idNguoiDung, sanLuongMua)
+
+                ConnectServer.getInstance(getApplicationContext()).getApi().themSPVaoGioHang(mCookies, mIdSP, idNguoiDung, sanLuongMua)
                         .enqueue(new Callback<Message>() {
                             @Override
                             public void onResponse(Call<Message> call, Response<Message> response) {
+                                mAlertDialog.dismiss();
+                                try {
+                                    if (response.code() == 401) {
+                                        Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+                                        intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                    if (response.code() == 200 && null != response.body()) {
+                                        viewSucc(mImageView, response.errorBody().string());
+                                    }
+                                    if (response.code() == 400 && null != response.errorBody()) {
+                                        String err = "";
+                                        err += response.errorBody().string();
+                                        viewError(err);
+                                    }
 
-                                if (null != response.body()) {
-                                    if (response.body().getMessage().equals("successful")) {
-                                        alertDialog.dismiss();
-                                        viewSucc(mImageView, "Đã đặt hàng thành công");
-                                    } else
-                                        viewError(getCurrentFocus(), response.body().getMessage());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<Message> call, Throwable t) {
-
+                                mAlertDialog.dismiss();
+                                viewError("Lỗi kết nối đến máy chủ!");
                             }
                         });
             }
         });
         dialogBuilder.setView(dialogView);
         dialogBuilder.setTitle("Đặt hàng");
-        alertDialog = dialogBuilder.create();
-        alertDialog.show();
+        mAlertDialog = dialogBuilder.create();
+        mAlertDialog.show();
     }
 
 
-    private void viewError(View view, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+    private void viewError( String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
         builder.setTitle("Cảnh báo");
         builder.setMessage(message);
         builder.setCancelable(false);
@@ -180,5 +195,11 @@ public class ChiTietSPActivity extends AppCompatActivity {
             }
         });
         snackbar.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

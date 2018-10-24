@@ -1,7 +1,8 @@
 package mycompany.com.nlcn.Fragment;
 
 import android.content.Intent;
-import android.net.Uri;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import mycompany.com.nlcn.Activity.CaiDatTaiKhoanActivity;
@@ -32,6 +35,8 @@ import retrofit2.Response;
 public class UserFrag extends Fragment {
     private String mIdNguoiDung = "";
 
+    private String mCookies;
+
     private CircleImageView mCircleImageView;
     private TextView mTvHoTen, mTvSDT, mTvDiaChi;
     private TextView mTvDonHangDangXuLy, mTvLichSuDatHang, mTvCaiDatTaiKhoan, mTvDangXuat, mTvPhanHoi;
@@ -41,12 +46,13 @@ public class UserFrag extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_user, container, false);
 
+        mCookies = SharedPreferencesHandler.getString(getActivity(), Constant.PREF_COOKIES);
         mIdNguoiDung = SharedPreferencesHandler.getString(getActivity(), "id");
 
         mCircleImageView = (CircleImageView) view.findViewById(R.id.circleImageView);
         mTvHoTen = (TextView) view.findViewById(R.id.tv_ho_ten);
         mTvSDT = (TextView) view.findViewById(R.id.tv_sdt);
-        mTvDiaChi = (TextView)view.findViewById(R.id.tv_dia_chi);
+        mTvDiaChi = (TextView) view.findViewById(R.id.tv_dia_chi);
 
         mTvDonHangDangXuLy = (TextView) view.findViewById(R.id.tv_don_hang_dag_xu_ly);
         mTvLichSuDatHang = (TextView) view.findViewById(R.id.tv_ls_dathang);
@@ -55,13 +61,14 @@ public class UserFrag extends Fragment {
 
         mTvPhanHoi = (TextView) view.findViewById(R.id.tv_phanhoi);
 
+
         setClickForView();
         layThongTinCaNhan();
 
         return view;
     }
 
-    private void setClickForView(){
+    private void setClickForView() {
         mTvDonHangDangXuLy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,26 +102,33 @@ public class UserFrag extends Fragment {
         mTvPhanHoi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Intent intent = new Intent(Intent.ACTION_VIEW)
-                        .setType("plain/text")
-                        .setData(Uri.parse("tamb1401088@student.etu.edu.vn"))
-                        .setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail")
-                        .putExtra(Intent.EXTRA_EMAIL, new String[]{"tamb1401088@student.etu.edu.vn"})
-                        .putExtra(Intent.EXTRA_SUBJECT, "Phản hồi ứng dụng Niên luận chuyên ngành")
-                        .putExtra(Intent.EXTRA_TEXT, "");
-                startActivity(intent);
+                Intent emailIntent = new Intent(Intent.ACTION_SEND);
+                emailIntent.setType("text/html");
+                final PackageManager pm = getActivity().getPackageManager();
+                final List<ResolveInfo> matches = pm.queryIntentActivities(emailIntent, 0);
+                String className = null;
+                for (final ResolveInfo info : matches) {
+                    if (info.activityInfo.packageName.equals("com.google.android.gm")) {
+                        className = info.activityInfo.name;
+
+                        if (className != null && !className.isEmpty()) {
+                            break;
+                        }
+                    }
+                }
+                emailIntent.setClassName("com.google.android.gm", className);
             }
         });
     }
 
-    private void layThongTinCaNhan(){
-        ConnectServer.getInstance(getActivity()).CreateApi().layThongTinNguoiDung(mIdNguoiDung).enqueue(new Callback<UserAcc>() {
+    private void layThongTinCaNhan() {
+        ConnectServer.getInstance(getActivity()).getApi().layThongTinNguoiDung(mCookies, mIdNguoiDung).enqueue(new Callback<UserAcc>() {
             @Override
             public void onResponse(Call<UserAcc> call, @NonNull Response<UserAcc> response) {
-                if(response.isSuccessful() && response.code() == 200){
+                if (response.isSuccessful() && response.code() == 200) {
                     UserAcc userAcc = response.body();
                     assert userAcc != null;
-                    Picasso.get().load(Constant.URL_SERVER+userAcc.getAvatar()).centerCrop().fit().into(mCircleImageView);
+                    Picasso.get().load(Constant.URL_SERVER + userAcc.getAvatar()).centerCrop().fit().into(mCircleImageView);
                     mTvHoTen.setText(userAcc.getName());
                     mTvSDT.setText(userAcc.getSdt());
                     mTvDiaChi.setText(userAcc.getDiachi());
@@ -129,7 +143,7 @@ public class UserFrag extends Fragment {
     }
 
     private void dangXuat() {
-        ConnectServer.getInstance(getActivity()).CreateApi().dangXuat().enqueue(new Callback<Message>() {
+        ConnectServer.getInstance(getActivity()).getApi().dangXuat(mCookies).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
                 if (response.isSuccessful()) {

@@ -50,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void register(View view) {
         if (checkEditText()) {
-            Call<Message> call = ConnectServer.getInstance(this).CreateApi().registerAcc(mName.getText().toString(),
+            Call<Message> call = ConnectServer.getInstance(this).getApi().registerAcc(mName.getText().toString(),
                     mUserName.getText().toString(),
                     mPassword.getText().toString(),
                     mSDT.getText().toString(),
@@ -99,5 +99,11 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

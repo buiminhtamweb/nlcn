@@ -1,9 +1,9 @@
-
 package mycompany.com.nlcn.Model;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 public class DonHangRes {
 
@@ -22,12 +22,23 @@ public class DonHangRes {
     @SerializedName("idNguoiMua")
     @Expose
     private String idNguoiMua;
+    @SerializedName("ngayDuyetDH")
+    @Expose
+    private String ngayDuyetDH;
     @SerializedName("tongTien")
     @Expose
     private Integer tongTien;
     @SerializedName("__v")
     @Expose
     private Integer v;
+
+    public String getNgayDuyetDH() {
+        return ngayDuyetDH;
+    }
+
+    public void setNgayDuyetDH(String ngayDuyetDH) {
+        this.ngayDuyetDH = ngayDuyetDH;
+    }
 
     public Boolean getDaDuyet() {
         return daDuyet;

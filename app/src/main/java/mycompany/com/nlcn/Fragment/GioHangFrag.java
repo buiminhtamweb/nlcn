@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import java.util.List;
 import mycompany.com.nlcn.Activity.ChiTietSPActivity;
 import mycompany.com.nlcn.Activity.LoginActivity;
 import mycompany.com.nlcn.Adapter.GioHangRecyclerViewAdapter;
+import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Data.API;
 import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.Model.DonHang;
@@ -35,9 +37,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.onClickListener,View.OnClickListener {
+public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.onClickListener, View.OnClickListener {
 
-    String idNguoiDung = "5bbc731072b68a180cd61ff2";
+    String idNguoiDung = "";
     private RecyclerView mRecyclerView;
     private List<SPGioHang> mGioHang = new ArrayList<>();
     private GioHangRecyclerViewAdapter mGioHangRecyclerViewAdapter;
@@ -45,14 +47,15 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     private AlertDialog mAlertDialog;
     private API api;
     private Button mBtnDatHang;
-
+    private String mCookies;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_giohang, container, false);
-
-        idNguoiDung = SharedPreferencesHandler.getString(getActivity(),"id");
+        mCookies = SharedPreferencesHandler.getString(getActivity(), Constant.PREF_COOKIES);
+        idNguoiDung = SharedPreferencesHandler.getString(getActivity(), "id");
+        Log.e("ID_User", "onCreateView: ID NGười Dùng: " + idNguoiDung);
 
         mBtnDatHang = (Button) view.findViewById(R.id.btn_dathang);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
@@ -71,15 +74,23 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
         return view;
     }
 
-
     private void layDuLieuGioHang() {
-        api = ConnectServer.getInstance(getActivity()).CreateApi();
 
-        api.layGioHang(idNguoiDung).enqueue(new Callback<List<SPGioHang>>() {
+
+        api = ConnectServer.getInstance(getActivity()).getApi();
+
+        api.layGioHang(mCookies, idNguoiDung).enqueue(new Callback<List<SPGioHang>>() {
             @Override
             public void onResponse(Call<List<SPGioHang>> call, Response<List<SPGioHang>> response) {
                 mGioHang.clear();
-                if (null != response.body()) {
+                if (response.code() == 401) {
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                    startActivity(intent);
+                    getActivity().finish();
+                }
+
+                if (response.isSuccessful() && null != response.body()) {
                     for (int i = 0; i < response.body().size(); i++) {
 
                         mGioHang.add(response.body().get(i));
@@ -98,8 +109,6 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
             }
         });
     }
-
-
 
     @Override
     public void onStart() {
@@ -124,32 +133,32 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
             @Override
             public void onClick(DialogInterface dialogInterface, final int i) {
 
-                api.xoaSPGioHang(idSanPham, idNguoiDung).enqueue(new Callback<Message>() {
+                api.xoaSPGioHang(mCookies, idSanPham, idNguoiDung).enqueue(new Callback<Message>() {
                     @Override
                     public void onResponse(Call<Message> call, Response<Message> response) {
 
-                        if(response.code()==401){
+                        if (response.code() == 401) {
                             Intent intent = new Intent(getActivity(), LoginActivity.class);
                             intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
                             startActivity(intent);
                             getActivity().finish();
                         }
 
-                        if (null != response.body()) {
-
-                            if (response.body().getMessage().equals("successful")) {
-                                viewSucc(mTvTongTien, "Đã xóa thành công");
-                                mGioHang.remove(position);
-                                mGioHangRecyclerViewAdapter.notifyDataSetChanged();
-                                mTvTongTien.setText("" + mGioHangRecyclerViewAdapter.getTongTien());
-                                mAlertDialog.dismiss();
-                            } else viewError(response.body().getMessage());
+                        if (response.isSuccessful() && response.code() == 200) {
+                            viewSucc(mTvTongTien, response.body().getMessage());
+                            mGioHang.remove(position);
+                            mGioHangRecyclerViewAdapter.notifyDataSetChanged();
+                            mTvTongTien.setText("" + mGioHangRecyclerViewAdapter.getTongTien());
+                            mAlertDialog.dismiss();
+                        }
+                        if (response.isSuccessful() && response.code() == 400) {
+                            viewError(response.body().getMessage());
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Message> call, Throwable t) {
-
+                        viewError("Lỗi kết nối đến máy chủ \nVui lòng thử lại !");
                     }
                 });
 
@@ -185,7 +194,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
             public void onClick(View view) {
 
                 final int sanLuongMua = Integer.parseInt(edtSanLuong.getText().toString());
-                api.capNhatSanLuongMuaSP(idSanPham, idNguoiDung, sanLuongMua).enqueue(new Callback<Message>() {
+                api.capNhatSanLuongMuaSP(mCookies, idSanPham, idNguoiDung, sanLuongMua).enqueue(new Callback<Message>() {
                     @Override
                     public void onResponse(Call<Message> call, Response<Message> response) {
                         if (null != response.body()) {
@@ -217,7 +226,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     }
 
     private void viewError(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Cảnh báo");
         builder.setMessage(message);
         builder.setCancelable(false);
@@ -235,60 +244,63 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
         Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
     }
 
-
     @Override
     public void onClick(View view) {
-        if(view.getId()== R.id.btn_dathang){
+        if (view.getId() == R.id.btn_dathang) {
             datHang();
         }
     }
 
-
-    private void datHang(){
-        if(mGioHang.size()>0){
-        List<SpMua> spMuas = new ArrayList<>();
-        for (SPGioHang sp : mGioHang) {
-            SpMua spMua = new SpMua();
-            spMua.setIdSpMua(sp.getIdSpMua());
-            spMua.setSanLuongMua(sp.getSanLuongMua());
-            spMua.setGiaMua(sp.getGiasp());
-            spMuas.add(spMua);
-
+    private void datHang() {
+        if (mGioHang.size() > 0) {
+            List<SpMua> spMuas = new ArrayList<>();
+            for (SPGioHang sp : mGioHang) {
+                SpMua spMua = new SpMua();
+                spMua.setIdSpMua(sp.getIdSpMua());
+                spMua.setSanLuongMua(sp.getSanLuongMua());
+                spMua.setGiaMua(sp.getGiasp());
+                spMuas.add(spMua);
 
 
-        }
-        DonHang donHang = new DonHang();
-        donHang.setIdNguoiMua(idNguoiDung);
-        donHang.setSpMua(spMuas);
-        donHang.setTongTien(Integer.parseInt(mTvTongTien.getText().toString()));
+            }
+            DonHang donHang = new DonHang();
+            donHang.setIdNguoiMua(idNguoiDung);
+            donHang.setSpMua(spMuas);
+            donHang.setTongTien(Integer.parseInt(mTvTongTien.getText().toString()));
 
-        ConnectServer.getInstance(getActivity()).CreateApi().datHang(donHang).enqueue(new Callback<Message>() {
-            @Override
-            public void onResponse(Call<Message> call, Response<Message> response) {
-                if (response.isSuccessful()){
-                    if(response.code()==200){ //Yêu cầu đặt hàng thành công
+            ConnectServer.getInstance(getActivity()).getApi().datHang(mCookies, donHang).enqueue(new Callback<Message>() {
+                @Override
+                public void onResponse(Call<Message> call, Response<Message> response) {
+                    if (response.isSuccessful() && response.code() == 401) {
+                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                        intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+
+                    if (response.isSuccessful() && null != response.body() && response.code() == 200) {//Yêu cầu đặt hàng thành công
                         viewSucc(mTvTongTien, response.body().getMessage());
 
                     }
-                    if (response.code()==400){
-                        for (SPGioHang spGH: mGioHang) {
-                            if(spGH.getIdSpMua().equals(response.body().getMessage())){
-                                viewError("Sản lượng " +spGH.getTensp()+ " không đủ trong kho không đủ để cung ứng \n" +
+                    if (response.isSuccessful() && response.code() == 400) {
+                        for (SPGioHang spGH : mGioHang) {
+                            if (spGH.getIdSpMua().equals(response.body().getMessage())) {
+                                viewError("Sản lượng " + spGH.getTensp() + " không đủ trong kho không đủ để cung ứng \n" +
                                         " Quí khách vui lòng cập nhật lại sản lượng mua");
                             }
                         }
                         viewError(response.body().getMessage());
                     }
+
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Message> call, Throwable t) {
+                @Override
+                public void onFailure(Call<Message> call, Throwable t) {
+                    viewError("Lỗi kết nối đến máy chủ \nVui lòng thử lại !");
+                }
+            });
 
-            }
-        });
-
-        }else {
+        } else {
             viewError("Giỏ hàng rỗng !");
         }
     }

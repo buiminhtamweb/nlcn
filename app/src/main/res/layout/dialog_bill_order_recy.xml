@@ -19,7 +19,7 @@
 
     <Button
         android:id="@+id/btn_close"
-        android:background="@color/primaryColor"
+        android:background="@color/colorPrimary"
         android:textColor="@color/white"
         android:layout_alignParentBottom="true"
         android:text="Đóng"
