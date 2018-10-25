@@ -278,11 +278,11 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
                         getActivity().finish();
                     }
 
-                    if (response.isSuccessful() && null != response.body() && response.code() == 200) {//Yêu cầu đặt hàng thành công
+                    if (response.code() == 200) {//Yêu cầu đặt hàng thành công
                         viewSucc(mTvTongTien, response.body().getMessage());
 
                     }
-                    if (response.isSuccessful() && response.code() == 400) {
+                    if (response.isSuccessful() && response.code() == 300) {
                         for (SPGioHang spGH : mGioHang) {
                             if (spGH.getIdSpMua().equals(response.body().getMessage())) {
                                 viewError("Sản lượng " + spGH.getTensp() + " không đủ trong kho không đủ để cung ứng \n" +

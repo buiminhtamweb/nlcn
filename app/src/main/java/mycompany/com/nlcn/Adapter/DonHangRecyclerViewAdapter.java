@@ -1,12 +1,12 @@
 package mycompany.com.nlcn.Adapter;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import java.util.List;
 
 import mycompany.com.nlcn.Model.ItemDonhang;
@@ -35,10 +35,10 @@ public class DonHangRecyclerViewAdapter extends RecyclerView.Adapter<DonHangRecy
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
 
-        holder.idDonHang.setText(mItemDonhangs.get(position).getId());
-        holder.tongTien.setText(mItemDonhangs.get(position).getTongTien()+"");
-        holder.soLuongSPMua.setText(mItemDonhangs.get(position).getSoluongspmua() + "");
-        holder.ngayMua.setText(mItemDonhangs.get(position).getNgayDatHang());
+        holder.idDonHang.setText("Mã đơn hàng: " + mItemDonhangs.get(position).getId());
+        holder.tongTien.setText("Tổng đơn hàng: " + mItemDonhangs.get(position).getTongTien() + " VND");
+        holder.soLuongSPMua.setText("Số lượng sản phẩm mua: " + mItemDonhangs.get(position).getSoluongspmua() + "");
+        holder.ngayMua.setText("Ngày mua: " + mItemDonhangs.get(position).getNgayDatHang());
 
         onScrollListener.onScroll(position);
     }
@@ -72,14 +72,13 @@ public class DonHangRecyclerViewAdapter extends RecyclerView.Adapter<DonHangRecy
         TextView ngayMua;
 
 
-
         public Holder(View view) {
             super(view);
 
             idDonHang = (TextView) view.findViewById(R.id.textView_id_don_hang);
             soLuongSPMua = (TextView) view.findViewById(R.id.textView_so_luong_sp_mua);
-            tongTien = (TextView) view.findViewById(R.id.textView_tongtien);
-            ngayMua = (TextView)view.findViewById(R.id.textView_ngay_mua);
+            tongTien = (TextView) view.findViewById(R.id.textView_tong_gia_don_hang);
+            ngayMua = (TextView) view.findViewById(R.id.textView_ngay_mua);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

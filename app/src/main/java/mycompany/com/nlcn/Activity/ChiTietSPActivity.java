@@ -138,8 +138,8 @@ public class ChiTietSPActivity extends AppCompatActivity {
                                         startActivity(intent);
                                         finish();
                                     }
-                                    if (response.code() == 200 && null != response.body()) {
-                                        viewSucc(mImageView, response.errorBody().string());
+                                    if (response.code() == 200 ) {
+                                        viewSucc(mImageView, "Đã đặt hàng thành công !");
                                     }
                                     if (response.code() == 400 && null != response.errorBody()) {
                                         String err = "";

@@ -14,6 +14,7 @@ public class ItemDonhang {
     @SerializedName("ngayDatHang")
     @Expose
     private String ngayDatHang;
+    
     @SerializedName("tongTien")
     @Expose
     private Integer tongTien;
