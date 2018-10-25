@@ -1,5 +1,6 @@
 package mycompany.com.nlcn.Activity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     private CheckBox mCBRememberMe;
     private AlertDialog mAlertDialog;
     private Snackbar mSnackbar;
+    private ProgressDialog mProgressDialog;
 
     private String mCookies = "";
 
@@ -54,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(final View v) {
-
+        viewProgressDialog("Đang đăng nhập ... ");
         if (checkNullDangNhap()) {
 
             Call<ResLogin> call = ConnectServer.getInstance(mContext).getApi().signInAcc(mCookies,
@@ -64,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
             call.enqueue(new Callback<ResLogin>() {
                 @Override
                 public void onResponse(Call<ResLogin> call, Response<ResLogin> response) {
-
+                    hideProgressDialog();
                     try {
                         if (response.body().getSERVERRESPONSE() == 1) {
 
@@ -112,38 +114,6 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(new Intent(this, RegisterActivity.class));
     }
 
-
-
-    private void viewError(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Cảnh báo");
-        builder.setMessage(message);
-        builder.setCancelable(false);
-        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        mAlertDialog = builder.create();
-        mAlertDialog.show();
-    }
-
-    private void viewSucc(View view, String message) {
-        mSnackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-
-        mSnackbar.setAction("Đi đến giỏ hàng", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                intent.putExtra("position", 1);
-                startActivity(intent);
-                finish();
-            }
-        });
-        mSnackbar.show();
-    }
-
     private boolean checkNullDangNhap() {
         if (mEdtUserName.getText().toString().equals("")) {
             mEdtUserName.setError("Chưa nhập tên đăng nhập");
@@ -155,12 +125,14 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void kiemTraDangNhap() {
-
+        viewProgressDialog("Đang đăng nhập ....");
 
         ConnectServer.getInstance(getApplicationContext()).getApi().kiemTraTrangThaiDangNhap(mCookies).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
                 Log.e("TAG", "onResponse: " + response.code());
+                hideProgressDialog();
+
                 if (response.code() == 200) {
                     Intent i = new Intent(getBaseContext(), MainActivity.class);
                     startActivity(i);
@@ -202,7 +174,39 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-//        if (mAlertDialog.isShowing()) mAlertDialog.dismiss();
-//        if (mSnackbar.isShown()) mSnackbar.dismiss();
+    }
+
+    private void viewError(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cảnh báo");
+        builder.setMessage(message);
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        mAlertDialog = builder.create();
+        mAlertDialog.show();
+    }
+
+    private void viewSucc(View view, String message) {
+        mSnackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT);
+        mSnackbar.show();
+    }
+
+    private void viewProgressDialog(String message){
+        if(null != mProgressDialog ) {
+            mProgressDialog = new ProgressDialog(getBaseContext());
+        }
+        mProgressDialog.setMessage(message);
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog(){
+        if(null != mProgressDialog ){
+            mProgressDialog.dismiss();
+        }
     }
 }

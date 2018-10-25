@@ -1,5 +1,6 @@
 package mycompany.com.nlcn.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -59,6 +60,14 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
             @Override
             public void onResponse(Call<DSDonHang> call, @NonNull Response<DSDonHang> response) {
                 if (response.isSuccessful() && response.code() == 200) {
+
+                    if (response.code() == 401) {
+                        Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+                        intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                        startActivity(intent);
+                        finish();
+                    }
+
                     for (ItemDonhang item : response.body().getDonhangs()
                             ) {
 

@@ -93,7 +93,6 @@
             </LinearLayout>
 
 
-
         </LinearLayout>
 
     </ScrollView>
@@ -109,6 +108,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:onClick="themVaoGioHang"/>
-
 
 </android.support.constraint.ConstraintLayout>

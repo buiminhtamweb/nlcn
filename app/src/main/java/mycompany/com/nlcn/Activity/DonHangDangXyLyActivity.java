@@ -70,6 +70,14 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
         ConnectServer.getInstance(this).getApi().layDSDonHang(mCookies, mIDNguoiDung, false, page).enqueue(new Callback<DSDonHang>() {
             @Override
             public void onResponse(Call<DSDonHang> call, @NonNull Response<DSDonHang> response) {
+
+                if (response.code() == 401) {
+                    Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+                    intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                    startActivity(intent);
+                    finish();
+                }
+
                 if (response.isSuccessful() && response.code() == 200) {
                     DSDonHang mDSDonHang = response.body();
 

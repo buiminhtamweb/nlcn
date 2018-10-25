@@ -3,6 +3,7 @@ package mycompany.com.nlcn.Adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,7 @@ public class SPDonHangRecyclerViewAdapter extends RecyclerView.Adapter<SPDonHang
     @Override
     public SPDonHangRecyclerViewAdapter.Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_donhang, parent, false);
+                .inflate(R.layout.item_sanpham_dathang, parent, false);
 
         return new Holder(itemView);
     }
@@ -38,6 +39,7 @@ public class SPDonHangRecyclerViewAdapter extends RecyclerView.Adapter<SPDonHang
 
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
+        Log.e("Adapter", "onBindViewHolder: "+  mSanPhams.get(position).getImgurl() );
         Picasso.get().load(Constant.URL_SERVER + mSanPhams.get(position).getImgurl()).fit().centerCrop().into(holder.mImageView);
         holder.mNameAgri.setText(mSanPhams.get(position).getTensp());
         holder.tongTien.setText("Giá mua: " + mSanPhams.get(position).getGiasp() + " VND");

@@ -12,16 +12,22 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import mycompany.com.nlcn.Adapter.ViewPagerAdapter;
+import mycompany.com.nlcn.Fragment.GioHangFrag;
+import mycompany.com.nlcn.Fragment.HomeFrag;
+import mycompany.com.nlcn.Fragment.UserFrag;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
         ViewPager.OnPageChangeListener {
 
-    private TextView mTextMessage;
     private ViewPagerAdapter mViewPagerAdapter;
     private ViewPager mViewPager;
     private MenuItem mPrevMenuItem;
     private BottomNavigationView mBottomNavigation;
-    private Toolbar mToolbar;
+//    private Toolbar mToolbar;
+
+    private HomeFrag mHomeFrag;
+    private GioHangFrag mGioHangFrag;
+    private UserFrag mUserFrag;
 
 
     @Override
@@ -33,15 +39,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 //        mToolbar = findViewById(R.id.toolbar);
 //        mToolbar.setTitle("Trang chủ");
 
+        mHomeFrag = new HomeFrag();
+        mGioHangFrag = new GioHangFrag();
+        mUserFrag = new UserFrag();
+
         mBottomNavigation = (BottomNavigationView) findViewById(R.id.navigation);
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mTextMessage = (TextView) findViewById(R.id.message);
 
         mBottomNavigation.setOnNavigationItemSelectedListener(this);
-        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),mHomeFrag, mGioHangFrag, mUserFrag );
         mViewPager.setAdapter(mViewPagerAdapter);
         mViewPager.addOnPageChangeListener(this);
         mViewPager.setOffscreenPageLimit(1);
+
     }
 
     @Override
@@ -52,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 return true;
             case R.id.navigation_dashboard:
                 mViewPager.setCurrentItem(1, true);
+                mGioHangFrag.layDuLieuGioHang(); //Load lại giỏ hàng
                 return true;
             case R.id.navigation_notifications:
                 mViewPager.setCurrentItem(2, true);

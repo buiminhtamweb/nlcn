@@ -162,7 +162,7 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
                                         getActivity().finish();
                                     }
                                     if (response.code() == 200 && null != response.body()) {
-                                        viewSucc(mRecyclerView, response.errorBody().string());
+                                        viewSucc(mRecyclerView, response.body().getMessage());
                                     }
                                     if (response.code() == 400 && null != response.errorBody()) {
                                         String err = "";

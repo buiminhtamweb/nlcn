@@ -61,7 +61,6 @@ public class UserFrag extends Fragment {
 
         mTvPhanHoi = (TextView) view.findViewById(R.id.tv_phanhoi);
 
-
         setClickForView();
         layThongTinCaNhan();
 
@@ -125,6 +124,14 @@ public class UserFrag extends Fragment {
         ConnectServer.getInstance(getActivity()).getApi().layThongTinNguoiDung(mCookies, mIdNguoiDung).enqueue(new Callback<UserAcc>() {
             @Override
             public void onResponse(Call<UserAcc> call, @NonNull Response<UserAcc> response) {
+
+                if (response.code() == 401) {
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                    startActivity(intent);
+                    getActivity().finish();
+                }
+
                 if (response.isSuccessful() && response.code() == 200) {
                     UserAcc userAcc = response.body();
                     assert userAcc != null;

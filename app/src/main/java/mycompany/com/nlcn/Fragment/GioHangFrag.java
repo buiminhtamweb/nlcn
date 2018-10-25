@@ -1,5 +1,6 @@
 package mycompany.com.nlcn.Fragment;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,6 +49,8 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     private API api;
     private Button mBtnDatHang;
     private String mCookies;
+    private ProgressDialog mProgressDialog;
+
 
     @Nullable
     @Override
@@ -74,8 +77,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
         return view;
     }
 
-    private void layDuLieuGioHang() {
-
+    public void layDuLieuGioHang() {
 
         api = ConnectServer.getInstance(getActivity()).getApi();
 
@@ -108,6 +110,67 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
 
             }
         });
+    }
+
+    private void datHang() {
+        viewProgressDialog("Đang đặt hàng ... ");
+        if (mGioHang.size() > 0) {
+            List<SpMua> spMuas = new ArrayList<>();
+            for (SPGioHang sp : mGioHang) { //Thêm sản phẩm vào giỏ hàng
+                SpMua spMua = new SpMua();
+                spMua.setIdSpMua(sp.getIdSpMua());
+                spMua.setSanLuongMua(sp.getSanLuongMua());
+                spMua.setGiaMua(sp.getGiasp());
+                spMuas.add(spMua);
+            }
+            DonHang donHang = new DonHang();
+            donHang.setIdNguoiMua(idNguoiDung);
+            donHang.setSpMua(spMuas);
+            donHang.setTongTien(Integer.parseInt(mTvTongTien.getText().toString()));
+
+            ConnectServer.getInstance(getActivity()).getApi().datHang(mCookies, donHang).enqueue(new Callback<Message>() {
+                @Override
+                public void onResponse(Call<Message> call, Response<Message> response) {
+
+                    hideProgressDialog();
+
+                    if (response.isSuccessful() && response.code() == 401) {
+                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                        intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+
+                    if (response.code() == 200) {//Yêu cầu đặt hàng thành công
+
+                        mGioHang.clear(); //Xóa các dữ liệu trong giỏ hàng
+                        mGioHangRecyclerViewAdapter.notifyDataSetChanged();
+
+                        viewSucc(mTvTongTien, response.body().getMessage());
+
+
+                    }
+                    if (response.isSuccessful() && response.code() == 300) {
+                        for (SPGioHang spGH : mGioHang) {
+                            if (spGH.getIdSpMua().equals(response.body().getMessage())) {
+                                viewError("Sản lượng " + spGH.getTensp() + " không đủ trong kho không đủ để cung ứng \n" +
+                                        " Quí khách vui lòng cập nhật lại sản lượng mua");
+                            }
+                        }
+                        viewError(response.body().getMessage());
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<Message> call, Throwable t) {
+                    viewError("Lỗi kết nối đến máy chủ \nVui lòng thử lại !");
+                }
+            });
+
+        } else {
+            viewError("Giỏ hàng rỗng !");
+        }
     }
 
     @Override
@@ -225,6 +288,14 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
 
     }
 
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.btn_dathang) {
+            datHang();
+        }
+    }
+
+
     private void viewError(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Cảnh báo");
@@ -244,64 +315,18 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
         Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
     }
 
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.btn_dathang) {
-            datHang();
+    private void viewProgressDialog(String message) {
+        if (null != mProgressDialog) {
+            mProgressDialog = new ProgressDialog(getContext());
+        }
+        mProgressDialog.setMessage(message);
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (null != mProgressDialog) {
+            mProgressDialog.dismiss();
         }
     }
 
-    private void datHang() {
-        if (mGioHang.size() > 0) {
-            List<SpMua> spMuas = new ArrayList<>();
-            for (SPGioHang sp : mGioHang) {
-                SpMua spMua = new SpMua();
-                spMua.setIdSpMua(sp.getIdSpMua());
-                spMua.setSanLuongMua(sp.getSanLuongMua());
-                spMua.setGiaMua(sp.getGiasp());
-                spMuas.add(spMua);
-
-
-            }
-            DonHang donHang = new DonHang();
-            donHang.setIdNguoiMua(idNguoiDung);
-            donHang.setSpMua(spMuas);
-            donHang.setTongTien(Integer.parseInt(mTvTongTien.getText().toString()));
-
-            ConnectServer.getInstance(getActivity()).getApi().datHang(mCookies, donHang).enqueue(new Callback<Message>() {
-                @Override
-                public void onResponse(Call<Message> call, Response<Message> response) {
-                    if (response.isSuccessful() && response.code() == 401) {
-                        Intent intent = new Intent(getActivity(), LoginActivity.class);
-                        intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
-                        startActivity(intent);
-                        getActivity().finish();
-                    }
-
-                    if (response.code() == 200) {//Yêu cầu đặt hàng thành công
-                        viewSucc(mTvTongTien, response.body().getMessage());
-
-                    }
-                    if (response.isSuccessful() && response.code() == 300) {
-                        for (SPGioHang spGH : mGioHang) {
-                            if (spGH.getIdSpMua().equals(response.body().getMessage())) {
-                                viewError("Sản lượng " + spGH.getTensp() + " không đủ trong kho không đủ để cung ứng \n" +
-                                        " Quí khách vui lòng cập nhật lại sản lượng mua");
-                            }
-                        }
-                        viewError(response.body().getMessage());
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<Message> call, Throwable t) {
-                    viewError("Lỗi kết nối đến máy chủ \nVui lòng thử lại !");
-                }
-            });
-
-        } else {
-            viewError("Giỏ hàng rỗng !");
-        }
-    }
 }

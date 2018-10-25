@@ -33,12 +33,12 @@ import retrofit2.Response;
 
 public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
-    private final int FULLNAME = 1;
-    private final int BIRTHDAY = 2;
-    private final int SEX = 3;
-    private final int TEL_CUS = 4;
-    private final int ADDRESS_CUS = 5;
-    private final int IMG_URL_CUS = 6;
+    private final int HO_TEN = 1;
+    private final int NGAY_SINH = 2;
+    private final int GIOI_TINH = 3;
+    private final int SDT = 4;
+    private final int DIA_CHI = 5;
+    private final int ANH_DAI_DIEN = 6;
 
     private CircleImageView mImgAnhDaiDien;
     private Button mBtnHoTen, mBtnDoiMK, mBtnNamSinh, mBtnGioiTinh, mBtnSDT, mBtnDiaChi;
@@ -145,7 +145,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         dialogBuilder.setTitle("Đổi họ tên");
         dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                updateUser(FULLNAME, mEdtHoTen.getText().toString());
+                updateUser(HO_TEN, mEdtHoTen.getText().toString());
             }
         });
 
@@ -197,7 +197,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 //                mBtnNamSinh.setText(datePicker.getDayOfMonth() + "-" + datePicker.getMonth() + "-" + datePicker.getYear());
-                updateUser(BIRTHDAY, datePicker.getDayOfMonth() + "-" + datePicker.getMonth() + "-" + datePicker.getYear());
+                updateUser(NGAY_SINH, datePicker.getDayOfMonth() + "-" + datePicker.getMonth() + "-" + datePicker.getYear());
 
             }
         });
@@ -232,7 +232,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         dialogBuilder.setTitle("Giới tính");
         dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                updateUser(SEX, spinGioiTinh.getSelectedItem().toString());
+                updateUser(GIOI_TINH, spinGioiTinh.getSelectedItem().toString());
             }
         });
         dialogBuilder.setNegativeButton("Cancel", null);
@@ -254,7 +254,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         dialogBuilder.setTitle("Đổi Số điện thoại");
         dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                updateUser(TEL_CUS, mEdtSDT.getText().toString());
+                updateUser(SDT, mEdtSDT.getText().toString());
             }
         });
 
@@ -279,7 +279,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         dialogBuilder.setTitle("Đổi địa chỉ");
         dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                updateUser(ADDRESS_CUS, mEdtAddress.getText().toString());
+                updateUser(DIA_CHI, mEdtAddress.getText().toString());
             }
         });
 
@@ -320,14 +320,35 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
     }
 
 
-    private void updateUser(int type, String data) {
+    private void updateUser(final int type, final String data) {
 
         ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mCookies,mIdNguoiDung, type, data).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
+
+                if (response.code() == 401) {
+                    Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+                    intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                    startActivity(intent);
+                    finish();
+                }
+
                 if(response.isSuccessful() && response.code()==200){
                     viewSucc(mBtnDiaChi, response.body().getMessage());
-                }else if(response.isSuccessful() && response.code()==400){
+                    switch (type){
+                        case HO_TEN:
+                            mBtnHoTen.setText(data);
+                            break;
+                        case SDT:
+                            mBtnSDT.setText(data);
+                            break;
+                        case DIA_CHI:
+                            mBtnDiaChi.setText(data);
+                            break;
+                    }
+
+
+                }else if(response.isSuccessful() && response.code()==300){
                     viewErr(response.body().getMessage());
                 }
             }
@@ -346,9 +367,17 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         ConnectServer.getInstance(this).getApi().capNhatMatKhau(mCookies,mIdNguoiDung, oldPass, newConfirmPass).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
+
+                if (response.code() == 401) {
+                    Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+                    intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                    startActivity(intent);
+                    finish();
+                }
+
                 if(response.isSuccessful() && response.code()==200){
                     viewSucc(mBtnDiaChi, response.body().getMessage());
-                }else if(response.isSuccessful() && response.code()==400){
+                }else if(response.isSuccessful() && response.code()==300){
                     viewErr(response.body().getMessage());
                 }
             }
@@ -378,16 +407,6 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
     private void viewSucc(View view, String message) {
         Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-
-        snackbar.setAction("Đi đến giỏ hàng", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                intent.putExtra("position", 1);
-                startActivity(intent);
-                finish();
-            }
-        });
         snackbar.show();
     }
 

@@ -12,23 +12,39 @@ import mycompany.com.nlcn.Fragment.UserFrag;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
-    private Fragment[] mChildFrags;
+    private HomeFrag mHomeFrag;
+    private GioHangFrag mGioHangFrag;
+    private UserFrag mUserFrag;
     private String[] mTitle;
 
-    public ViewPagerAdapter(FragmentManager fm) {
+    public ViewPagerAdapter(FragmentManager fm, HomeFrag mHomeFrag, GioHangFrag mGioHangFrag, UserFrag mUserFrag) {
         super(fm);
-        mChildFrags = new Fragment[]{new HomeFrag(), new GioHangFrag(), new UserFrag()};
+        this.mHomeFrag = mHomeFrag;
+        this.mGioHangFrag = mGioHangFrag;
+        this.mUserFrag = mUserFrag;
+
+
         mTitle = new String[]{"Trang chủ", "Đặt hàng", "Tài khoản"};
     }
 
     @Override
     public Fragment getItem(int position) {
-        return mChildFrags[position];
+        switch (position) {
+            case 0:
+                return mHomeFrag;
+            case 1:
+                return mGioHangFrag;
+            case 2:
+                return mUserFrag;
+            default:
+                return null;
+        }
+
     }
 
     @Override
     public int getCount() {
-        return mChildFrags.length;
+        return 3;
     }
 
     @Nullable
