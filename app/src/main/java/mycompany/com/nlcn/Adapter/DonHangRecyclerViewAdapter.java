@@ -33,12 +33,24 @@ public class DonHangRecyclerViewAdapter extends RecyclerView.Adapter<DonHangRecy
 
 
     @Override
-    public void onBindViewHolder(@NonNull Holder holder, int position) {
+    public void onBindViewHolder(@NonNull Holder holder, final int position) {
 
         holder.idDonHang.setText("Mã đơn hàng: " + mItemDonhangs.get(position).getId());
         holder.tongTien.setText("Tổng đơn hàng: " + mItemDonhangs.get(position).getTongTien() + " VND");
         holder.soLuongSPMua.setText("Số lượng sản phẩm mua: " + mItemDonhangs.get(position).getSoluongspmua() + "");
         holder.ngayMua.setText("Ngày mua: " + mItemDonhangs.get(position).getNgayDatHang());
+        if(null != mItemDonhangs.get(position).getNgayDuyetDH()){
+            holder.ngayDuyet.setVisibility(View.VISIBLE);
+            holder.ngayDuyet.setText("Ngày duyệt đơn hàng: " +mItemDonhangs.get(position).getNgayDuyetDH() );
+        }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickListener.onItemClick(position, mItemDonhangs.get(position).getId());
+            }
+        });
+
 
         onScrollListener.onScroll(position);
     }
@@ -69,7 +81,7 @@ public class DonHangRecyclerViewAdapter extends RecyclerView.Adapter<DonHangRecy
         TextView idDonHang;
         TextView soLuongSPMua;
         TextView tongTien;
-        TextView ngayMua;
+        TextView ngayMua, ngayDuyet;
 
 
         public Holder(View view) {
@@ -79,13 +91,9 @@ public class DonHangRecyclerViewAdapter extends RecyclerView.Adapter<DonHangRecy
             soLuongSPMua = (TextView) view.findViewById(R.id.textView_so_luong_sp_mua);
             tongTien = (TextView) view.findViewById(R.id.textView_tong_gia_don_hang);
             ngayMua = (TextView) view.findViewById(R.id.textView_ngay_mua);
+            ngayDuyet = (TextView) view.findViewById(R.id.textView_ngay_duyet);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onClickListener.onItemClick(getAdapterPosition(), mItemDonhangs.get(getAdapterPosition()).getId());
-                }
-            });
+
         }
     }
 }

@@ -135,7 +135,11 @@ public class UserFrag extends Fragment {
                 if (response.isSuccessful() && response.code() == 200) {
                     UserAcc userAcc = response.body();
                     assert userAcc != null;
-                    Picasso.get().load(Constant.URL_SERVER + userAcc.getAvatar()).centerCrop().fit().into(mCircleImageView);
+                    Picasso.get().load(Constant.URL_SERVER + userAcc.getAvatar())
+                            .error(R.drawable.logoapp)
+                            .centerCrop()
+                            .fit()
+                            .into(mCircleImageView);
                     mTvHoTen.setText(userAcc.getName());
                     mTvSDT.setText(userAcc.getSdt());
                     mTvDiaChi.setText(userAcc.getDiachi());

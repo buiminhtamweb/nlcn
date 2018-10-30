@@ -113,8 +113,9 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     }
 
     private void datHang() {
-        viewProgressDialog("Đang đặt hàng ... ");
+
         if (mGioHang.size() > 0) {
+            viewProgressDialog("Đang đặt hàng ... ");
             List<SpMua> spMuas = new ArrayList<>();
             for (SPGioHang sp : mGioHang) { //Thêm sản phẩm vào giỏ hàng
                 SpMua spMua = new SpMua();
@@ -316,7 +317,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     }
 
     private void viewProgressDialog(String message) {
-        if (null != mProgressDialog) {
+        if (null == mProgressDialog) {
             mProgressDialog = new ProgressDialog(getContext());
         }
         mProgressDialog.setMessage(message);

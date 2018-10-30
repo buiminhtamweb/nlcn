@@ -84,7 +84,7 @@ public class RegisterActivity extends AppCompatActivity {
         } else if (mUserName.getText().toString().equals("")) {
             mUserName.setError("Chua nhap Username");
         } else if (mSDT.getText().toString().equals("")) {
-            mSDT.setError("Email chua nhap");
+            mSDT.setError("SDT chua nhap");
         } else if (mDiaChi.getText().toString().equals("")) {
             mDiaChi.setError("Địa chỉ chưa nhập");
         }        else if (mPassword.getText().toString().length() < 7) {

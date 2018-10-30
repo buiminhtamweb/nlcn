@@ -197,8 +197,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void viewProgressDialog(String message){
-        if(null != mProgressDialog ) {
-            mProgressDialog = new ProgressDialog(getBaseContext());
+        if(null == mProgressDialog ) {
+            mProgressDialog = new ProgressDialog(this);
         }
         mProgressDialog.setMessage(message);
         mProgressDialog.show();

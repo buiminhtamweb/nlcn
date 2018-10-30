@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,11 +46,24 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
     private int mPageCurrent;
     private int mNumPage;
     private String mCookies;
+    private AlertDialog mDialogAgriList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_don_hang_dang_xu_ly);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finish();
+                }
+            });
+        }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -128,7 +142,7 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
         recyAgriOrderAdapter.setOnClickListener(new SPDonHangRecyclerViewAdapter.onClickListener() {
             @Override
             public void onItemClick(int position, String idSanPham) {
-                intent.putExtra("idSanPham", idSanPham);
+                intent.putExtra("idSP", idSanPham);
                 startActivity(intent);
                 finish();
             }
@@ -136,7 +150,6 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
 
         Button btnHuy = (Button) dialogView.findViewById(R.id.btn_close);
         dialogBuilder.setTitle("Danh sách nông sản đang xử lý");
-
 
         final TextView tvIDDonHang = (TextView) dialogView.findViewById(R.id.textView_id_don_hang);
 //        TextView tvSoLuongSPMua = (TextView) dialogView.findViewById(R.id.textView_so_luong_sp_mua);
@@ -173,12 +186,7 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
 
                             }
                         });
-
-
-
                     }
-
-
                 }
             }
 
@@ -188,38 +196,8 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
             }
         });
 
-
-        //Load dữ liệu danh sách nông sản đã dặt hàng
-//        for (int i = 0; i < itemSanphams.size(); i++) {
-//
-//            final AgriOrderItemObject agriOrderItem = new AgriOrderItemObject();
-//            //Set Giá mua cũ và số lượng mua
-//            agriOrderItem.setIdAGRI(agriOrderList.get(i).getIDAGRI());
-//            agriOrderItem.setpRICE_ORDER(agriOrderList.get(i).getCURRENTPRICE());
-//            agriOrderItem.setnUM_ORDER(agriOrderList.get(i).getNUMOFAGRI());
-//
-//            //Lấy thông tin Hình và Tên
-//            Call<AgricLiteObject> call = api.getArgiLite(agriOrderList.get(i).getIDAGRI());
-//            call.enqueue(new Callback<AgricLiteObject>() {
-//                @Override
-//                public void onResponse(Call<AgricLiteObject> call, Response<AgricLiteObject> response) {
-//                    if (!response.body().equals("")) {
-//                        agriOrderItem.setnAMEAGRI(response.body().getNAMEAGRI());
-//                        agriOrderItem.setiMGURLAGRI(response.body().getIMGURLAGRI());
-//                    }
-//                }
-//                @Override
-//                public void onFailure(Call<AgricLiteObject> call, Throwable t) {
-//
-//                }
-//            });
-//            agriOrderItemList.add(agriOrderItem);
-//            recyAgriOrderAdapter.notifyDataSetChanged();
-//        }
-
-
         //Show Dialog
-        final AlertDialog mDialogAgriList = dialogBuilder.create();
+        mDialogAgriList = dialogBuilder.create();
         mDialogAgriList.show();
         btnHuy.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -243,9 +221,22 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if(mDialogAgriList != null && mDialogAgriList.isShowing()){
+            mDialogAgriList.cancel();
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        if(mDialogAgriList != null && mDialogAgriList.isShowing()){
+            mDialogAgriList.cancel();
+        }else {
+            finish();
+        }
+
     }
 
 

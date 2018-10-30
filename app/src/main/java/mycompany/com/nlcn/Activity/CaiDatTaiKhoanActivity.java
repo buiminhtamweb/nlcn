@@ -1,14 +1,24 @@
 package mycompany.com.nlcn.Activity;
 
+import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,8 +26,13 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import mycompany.com.nlcn.Constant;
@@ -26,6 +41,7 @@ import mycompany.com.nlcn.MainActivity;
 import mycompany.com.nlcn.Model.Message;
 import mycompany.com.nlcn.Model.UserAcc;
 import mycompany.com.nlcn.R;
+import mycompany.com.nlcn.utils.RealPathUtil;
 import mycompany.com.nlcn.utils.SharedPreferencesHandler;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,6 +61,8 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
     private String mIdNguoiDung;
     private String mCookies;
+
+    private ProgressDialog mProgressDialog;
 
 
     @Override
@@ -84,7 +102,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         mImgAnhDaiDien.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //
+                chooseImage();
             }
         });
 
@@ -302,7 +320,11 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
                 if (response.isSuccessful()){
                     UserAcc userAcc = response.body();
-                    Picasso.get().load(Constant.URL_SERVER+ userAcc.getAvatar()).fit().centerCrop().into(mImgAnhDaiDien);
+                    Picasso.get().load(Constant.URL_SERVER+ userAcc.getAvatar())
+                            .error(R.drawable.add)
+                            .fit()
+                            .centerCrop()
+                            .into(mImgAnhDaiDien);
                     mBtnHoTen.setText(userAcc.getName());
                     mBtnDiaChi.setText(userAcc.getDiachi());
                     mBtnSDT.setText(userAcc.getSdt());
@@ -414,5 +436,105 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    private void checkPermistion() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        1);
+            }
+        }
+    }
+
+    public  void chooseImage(){
+        checkPermistion();
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Bitmap bitmap = null;
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0 && resultCode == this.RESULT_OK) {
+            Uri uri = data.getData();
+
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+
+               // bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+
+                uploadImage(uri,bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // Load image
+//            Glide.with(MainActivity.this).load(uri).override(420, 594).centerCrop().into(imageView);
+            //Toast.makeText(this, PATH, Toast.LENGTH_LONG).show();
+
+
+        }
+    }
+
+    // Encode bitmap to String
+    public String getBitMap(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
+    public void uploadImage(final Uri uri, final Bitmap bitmap) {
+
+        viewProgressDialog("Đang upload ảnh ...");
+
+        String imgCode = getBitMap(bitmap);
+        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mCookies,mIdNguoiDung,ANH_DAI_DIEN,imgCode).enqueue(new Callback<Message>() {
+            @Override
+            public void onResponse(Call<Message> call, Response<Message> response) {
+//                Message message = response.body();
+
+                hideProgressDialog();
+                if (response.code()==200) {
+
+                    Picasso.get().load(uri)
+                            .error(R.drawable.add)
+                            .fit()
+                            .centerCrop()
+                            .into(mImgAnhDaiDien);
+                    viewSucc(mBtnDiaChi, "Đã cập nhật ảnh đại diện thành công");
+                } else {
+                    viewErr("Lỗi !  Chưa cập nhập ảnh đại diện");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Message> call, Throwable t) {
+                Log.e("UPLOAD_IMG", t.getMessage());
+            }
+        });
+    }
+
+    private void viewProgressDialog(String message){
+        if(null == mProgressDialog ) {
+            mProgressDialog = new ProgressDialog(this);
+        }
+        mProgressDialog.setMessage(message);
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog(){
+        if(null != mProgressDialog ){
+            mProgressDialog.dismiss();
+        }
     }
 }
