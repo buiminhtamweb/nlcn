@@ -48,6 +48,10 @@
 
         </activity>
 
+        <activity android:name=".Activity.TimKiemActivity">
+
+        </activity>
+
 
     </application>
 

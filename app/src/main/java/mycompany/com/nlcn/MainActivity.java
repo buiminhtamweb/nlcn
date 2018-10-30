@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import mycompany.com.nlcn.Adapter.ViewPagerAdapter;
+import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.Fragment.GioHangFrag;
 import mycompany.com.nlcn.Fragment.HomeFrag;
 import mycompany.com.nlcn.Fragment.UserFrag;
@@ -104,5 +105,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             mViewPager.setCurrentItem(position);
         }
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        ConnectServer.destroy();
     }
 }

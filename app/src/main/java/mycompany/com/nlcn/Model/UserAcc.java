@@ -22,6 +22,30 @@ public class UserAcc {
     @Expose
     private String avatar;
 
+    @SerializedName("namsinh")
+    @Expose
+    private String namsinh;
+
+    @SerializedName("gioitinh")
+    @Expose
+    private String gioitinh;
+
+    public String getNamsinh() {
+        return namsinh;
+    }
+
+    public void setNamsinh(String namsinh) {
+        this.namsinh = namsinh;
+    }
+
+    public String getGioitinh() {
+        return gioitinh;
+    }
+
+    public void setGioitinh(String gioitinh) {
+        this.gioitinh = gioitinh;
+    }
+
     public String getName() {
         return name;
     }

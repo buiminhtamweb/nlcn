@@ -215,7 +215,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 //                mBtnNamSinh.setText(datePicker.getDayOfMonth() + "-" + datePicker.getMonth() + "-" + datePicker.getYear());
-                updateUser(NGAY_SINH, datePicker.getDayOfMonth() + "-" + datePicker.getMonth() + "-" + datePicker.getYear());
+                updateUser(NGAY_SINH, datePicker.getDayOfMonth() + "/" + datePicker.getMonth() + "/" + datePicker.getYear());
 
             }
         });
@@ -328,6 +328,10 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
                     mBtnHoTen.setText(userAcc.getName());
                     mBtnDiaChi.setText(userAcc.getDiachi());
                     mBtnSDT.setText(userAcc.getSdt());
+                    if (userAcc.getNamsinh() != null)
+                        mBtnNamSinh.setText(userAcc.getNamsinh());
+                    if (userAcc.getGioitinh() != null)
+                        mBtnGioiTinh.setText(userAcc.getGioitinh());
                 }
 
             }

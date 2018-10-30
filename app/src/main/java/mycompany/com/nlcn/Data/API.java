@@ -32,6 +32,9 @@ public interface API {
     @GET("sanphams")
     Call<DataSanPham> getDSSanPham(@Query("page") int page);
 
+    @GET("timkiem")
+    Call<DataSanPham> timKiem(@Query("keyWord") String keyWord,@Query("page") int page);
+
     @GET("sanpham")
     Call<ChiTietSanPham> getChiTietSanPham(@Query("idSP") String idSP);
 

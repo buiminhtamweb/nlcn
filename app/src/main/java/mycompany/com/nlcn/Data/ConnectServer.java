@@ -45,6 +45,7 @@ public class ConnectServer {
 
     public static void destroy() {
         mConnectServer = null;
+        Log.e("SV", "Destroy ConnectServer "  );
     }
 
     public API getApi() {
