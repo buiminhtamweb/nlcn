@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +44,8 @@ public class UserFrag extends Fragment {
 
     private CircleImageView mCircleImageView;
     private TextView mTvHoTen, mTvSDT, mTvDiaChi;
-    private TextView mTvDonHangDangXuLy, mTvLichSuDatHang, mTvCaiDatTaiKhoan, mTvDangXuat, mTvPhanHoi;
+    private TextView mTvDonHangDangXuLy, mTvLichSuDatHang, mTvCaiDatTaiKhoan, mTvDangXuat, mTvPhanHoi, mTvThongTin;
+    private AlertDialog mAlertDialog;
 
     @Nullable
     @Override
@@ -62,6 +64,7 @@ public class UserFrag extends Fragment {
         mTvLichSuDatHang = (TextView) view.findViewById(R.id.tv_ls_dathang);
         mTvCaiDatTaiKhoan = (TextView) view.findViewById(R.id.tv_caidat);
         mTvDangXuat = (TextView) view.findViewById(R.id.tv_dangxuat);
+        mTvThongTin = (TextView) view.findViewById(R.id.tv_about);
 
         mTvPhanHoi = (TextView) view.findViewById(R.id.tv_phanhoi);
 
@@ -105,17 +108,28 @@ public class UserFrag extends Fragment {
         mTvPhanHoi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    Intent intent = new Intent (Intent.ACTION_VIEW , Uri.parse("mailto:" + "tamb1401088@student.ctu.edu.vn"));
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "Phản hồi ứng dụng Niên luận chuyên ngành");
-                    intent.putExtra(Intent.EXTRA_TEXT, "");
-                    startActivity(intent);
-                } catch(Exception e) {
-                    viewError("Máy của bạn chưa cài đặt ứng dụng gửi Email !");
-                    e.printStackTrace();
-                }
+                phanHoi();
             }
         });
+
+        mTvThongTin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                thongTin();
+            }
+        });
+    }
+
+    private void phanHoi() {
+        try {
+            Intent intent = new Intent (Intent.ACTION_VIEW , Uri.parse("mailto:" + "tamb1401088@student.ctu.edu.vn"));
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Phản hồi ứng dụng Niên luận chuyên ngành");
+            intent.putExtra(Intent.EXTRA_TEXT, "");
+            startActivity(intent);
+        } catch(Exception e) {
+            viewError("Máy của bạn chưa cài đặt ứng dụng gửi Email !");
+            e.printStackTrace();
+        }
     }
 
     public void layThongTinCaNhan() {
@@ -152,20 +166,56 @@ public class UserFrag extends Fragment {
     }
 
     private void dangXuat() {
-        ConnectServer.getInstance(getActivity()).getApi().dangXuat(mCookies).enqueue(new Callback<Message>() {
-            @Override
-            public void onResponse(Call<Message> call, Response<Message> response) {
-                if (response.isSuccessful()) {
-                    Snackbar.make(mCircleImageView, response.body().getMessage(), Snackbar.LENGTH_LONG).show();
-                    startActivity(new Intent(getActivity(), LoginActivity.class));
-                }
-            }
 
-            @Override
-            public void onFailure(Call<Message> call, Throwable t) {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+        alertBuilder.setTitle("Xác nhận đăng xuất")
+                .setMessage("Bạn có chắc chắn đăng xuất tài khoản ra khỏi chương trình")
+                .setNeutralButton("Đồng ý", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ConnectServer.getInstance(getActivity()).getApi().dangXuat(mCookies).enqueue(new Callback<Message>() {
+                            @Override
+                            public void onResponse(Call<Message> call, Response<Message> response) {
+                                if (response.isSuccessful()) {
+                                    Snackbar.make(mCircleImageView, response.body().getMessage(), Snackbar.LENGTH_LONG).show();
+                                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                                }
+                            }
 
+                            @Override
+                            public void onFailure(Call<Message> call, Throwable t) {
+
+                            }
+                        });
+                    }
+                })
+                .setNeutralButton("Hủy",null);
+
+        mAlertDialog = alertBuilder.create();
+        mAlertDialog.show();
+
+    }
+
+    private void thongTin() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = this.getLayoutInflater();
+
+        //Tham chieu layout
+        View dialogView = inflater.inflate(R.layout.dialog_info_app, null);
+        dialogBuilder.setView(dialogView);
+        Button btnHuy = (Button) dialogView.findViewById(R.id.btn_close);
+
+        //Show Dialog
+        mAlertDialog = dialogBuilder.create();
+        mAlertDialog.show();
+        btnHuy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAlertDialog.dismiss();
             }
         });
+
+
     }
 
 
@@ -187,5 +237,13 @@ public class UserFrag extends Fragment {
 
     private void viewSucc(View view, String message) {
         Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mAlertDialog != null && mAlertDialog.isShowing()){
+            mAlertDialog.cancel();
+        }
     }
 }

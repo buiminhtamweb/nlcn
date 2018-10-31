@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">NLCN</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">Sản phẩm</string>
+    <string name="title_dashboard">Giỏ hàng</string>
+    <string name="title_notifications">Tài khoản</string>
 
     <string name="code_0">Connection timeout</string>
     <string name="code_404">Resource not avaliable</string>
