@@ -16,12 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import mycompany.com.nlcn.Activity.ChiTietSPActivity;
 import mycompany.com.nlcn.Activity.LoginActivity;
+import mycompany.com.nlcn.Activity.TimKiemActivity;
 import mycompany.com.nlcn.Adapter.SanPhamRecyclerViewAdapter;
 import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Data.API;
@@ -45,9 +47,8 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
     private API mApi;
     private AlertDialog mAlertDialog;
     private String idNguoiDung = "";
-
     private String mCookies;
-
+    private TextView mTvSearch;
 
     @Nullable
     @Override
@@ -56,6 +57,14 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
 
         mCookies = SharedPreferencesHandler.getString(getActivity(), Constant.PREF_COOKIES);
         idNguoiDung = SharedPreferencesHandler.getString(getActivity(), "id");
+
+        mTvSearch = v.findViewById(R.id.tv_seach);
+        mTvSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getActivity(), TimKiemActivity.class));
+            }
+        });
 
         mRecyclerView = v.findViewById(R.id.recyclerview);
 

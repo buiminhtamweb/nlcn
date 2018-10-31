@@ -1,17 +1,21 @@
 package mycompany.com.nlcn.Fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -101,26 +105,20 @@ public class UserFrag extends Fragment {
         mTvPhanHoi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent emailIntent = new Intent(Intent.ACTION_SEND);
-                emailIntent.setType("text/html");
-                final PackageManager pm = getActivity().getPackageManager();
-                final List<ResolveInfo> matches = pm.queryIntentActivities(emailIntent, 0);
-                String className = null;
-                for (final ResolveInfo info : matches) {
-                    if (info.activityInfo.packageName.equals("com.google.android.gm")) {
-                        className = info.activityInfo.name;
-
-                        if (className != null && !className.isEmpty()) {
-                            break;
-                        }
-                    }
+                try {
+                    Intent intent = new Intent (Intent.ACTION_VIEW , Uri.parse("mailto:" + "tamb1401088@student.ctu.edu.vn"));
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Phản hồi ứng dụng Niên luận chuyên ngành");
+                    intent.putExtra(Intent.EXTRA_TEXT, "");
+                    startActivity(intent);
+                } catch(Exception e) {
+                    viewError("Máy của bạn chưa cài đặt ứng dụng gửi Email !");
+                    e.printStackTrace();
                 }
-                emailIntent.setClassName("com.google.android.gm", className);
             }
         });
     }
 
-    private void layThongTinCaNhan() {
+    public void layThongTinCaNhan() {
         ConnectServer.getInstance(getActivity()).getApi().layThongTinNguoiDung(mCookies, mIdNguoiDung).enqueue(new Callback<UserAcc>() {
             @Override
             public void onResponse(Call<UserAcc> call, @NonNull Response<UserAcc> response) {
@@ -171,4 +169,23 @@ public class UserFrag extends Fragment {
     }
 
 
+
+    private void viewError(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Cảnh báo");
+        builder.setMessage(message);
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void viewSucc(View view, String message) {
+        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
+    }
 }

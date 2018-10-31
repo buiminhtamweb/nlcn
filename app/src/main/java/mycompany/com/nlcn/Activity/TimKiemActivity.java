@@ -8,11 +8,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+
 import java.util.ArrayList;
 import java.util.List;
 import mycompany.com.nlcn.Adapter.SanPhamRecyclerViewAdapter;
@@ -39,6 +42,8 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
     private AlertDialog mAlertDialog;
     private String idNguoiDung = "";
 
+    private ImageView mImgSearch;
+    private EditText mEdtKeyWord;
     private String mCookies;
     private String mKeyWord;
 
@@ -49,6 +54,30 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
 
         mCookies = SharedPreferencesHandler.getString(this, Constant.PREF_COOKIES);
         idNguoiDung = SharedPreferencesHandler.getString(this, "id");
+
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+            setSupportActionBar(toolbar);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finish();
+                }
+            });
+        }
+
+
+        mEdtKeyWord = (EditText) findViewById(R.id.editText_search);
+        mImgSearch = (ImageView) findViewById(R.id.img_ic_search);
+        mImgSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mKeyWord = mEdtKeyWord.getText().toString();
+                timKiem(mKeyWord, 1);
+            }
+        });
 
         mRecyclerView = findViewById(R.id.recyclerview);
 
@@ -80,7 +109,7 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
 
                     }
                     mSanPhamRecyclerViewAdapter.notifyDataSetChanged();
-                    Log.e("HOME_FRAG", "onResponse: Succ");
+                    Log.e("SEARCH", "onResponse: Succ");
                 }
 
 
@@ -88,7 +117,7 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
 
             @Override
             public void onFailure(Call<DataSanPham> call, Throwable t) {
-                Log.e("HOME_FRAG", "onFailure: " + t.getMessage());
+                Log.e("SEARCH", "onFailure: " + t.getMessage());
                 viewError("Lỗi kết nối đến máy chủ!");
             }
         });

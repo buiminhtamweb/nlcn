@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 return true;
             case R.id.navigation_notifications:
                 mViewPager.setCurrentItem(2, true);
+                mUserFrag.layThongTinCaNhan(); //Load lại thông tin cá nhân
                 return true;
         }
         return false;
