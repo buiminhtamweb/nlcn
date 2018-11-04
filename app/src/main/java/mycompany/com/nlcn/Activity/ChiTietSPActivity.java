@@ -8,7 +8,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -18,8 +17,9 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+
 import mycompany.com.nlcn.Constant;
-import mycompany.com.nlcn.Data.API;
 import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.MainActivity;
 import mycompany.com.nlcn.Model.ChiTietSanPham;
@@ -39,6 +39,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
     private AlertDialog alertDialog = null;
     private AlertDialog mAlertDialog;
     private String mCookies;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +49,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
         if (null != intent) {
             mIdSP = intent.getExtras().getString("idSP", "");
         } else finish();
-        mCookies = SharedPreferencesHandler.getString(getBaseContext(),Constant.PREF_COOKIES);
+        mCookies = SharedPreferencesHandler.getString(getBaseContext(), Constant.PREF_COOKIES);
         idNguoiDung = SharedPreferencesHandler.getString(this, "id");
 
         mImageView = (ImageView) findViewById(R.id.img_agri);
@@ -73,7 +74,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ChiTietSanPham> call, Response<ChiTietSanPham> response) {
 
-                if (null != response.body()) {
+                if (response.code() == 200 && null != response.body()) {
                     ChiTietSanPham chiTietSanPham = response.body();
                     Picasso.get().load(Constant.URL_SERVER + chiTietSanPham.getImgurl()).fit().centerCrop().into(mImageView);
                     mTenSanPham.setText(chiTietSanPham.getTensp());
@@ -81,11 +82,18 @@ public class ChiTietSPActivity extends AppCompatActivity {
                     mSanLuongSP.setText("Tồn kho: " + chiTietSanPham.getSanluong().toString());
                     mChiTietSP.setText(chiTietSanPham.getChitietsp().toString());
                 }
+                if (response.code() == 400 && response.errorBody() != null) {
+                    try {
+                        viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
             @Override
             public void onFailure(Call<ChiTietSanPham> call, Throwable t) {
-                finish();
+                viewErrorExitApp();
             }
         });
 
@@ -101,6 +109,22 @@ public class ChiTietSPActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         finish();
+    }
+
+    private void viewErrorExitApp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cảnh báo");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                System.exit(1);
+            }
+        });
+        AlertDialog mAlertDialog = builder.create();
+        mAlertDialog.show();
     }
 
 
@@ -138,7 +162,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
                                         startActivity(intent);
                                         finish();
                                     }
-                                    if (response.code() == 200 ) {
+                                    if (response.code() == 200) {
                                         viewSucc(mImageView, "Đã đặt hàng thành công !");
                                     }
                                     if (response.code() == 400 && null != response.errorBody()) {
@@ -167,7 +191,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
     }
 
 
-    private void viewError( String message) {
+    private void viewError(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
         builder.setTitle("Cảnh báo");
         builder.setMessage(message);

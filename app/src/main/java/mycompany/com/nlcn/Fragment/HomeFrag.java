@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,7 +91,7 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
         call.enqueue(new Callback<DataSanPham>() {
             @Override
             public void onResponse(Call<DataSanPham> call, Response<DataSanPham> response) {
-                if (null != response) {
+                if (null != response.body() && response.code() == 200) {
                     mPageCurrent = Integer.parseInt(response.body().getPage());
                     mNumPage = response.body().getNumpages();
 
@@ -100,6 +101,13 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
                     }
                     mSanPhamRecyclerViewAdapter.notifyDataSetChanged();
                     Log.e("HOME_FRAG", "onResponse: Succ");
+                }
+                if (response.code() == 400) {
+                    try {
+                        viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
@@ -227,4 +235,6 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
         });
         snackbar.show();
     }
+
+
 }

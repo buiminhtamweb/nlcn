@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import java.io.IOException;
+
 import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.MainActivity;
@@ -104,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<ResLogin> call, Throwable t) {
-                    viewError("Lỗi không thể kết nối đến máy chủ !");
+                    viewErrorExitApp();
                 }
             });
         }
@@ -145,13 +147,21 @@ public class LoginActivity extends AppCompatActivity {
                     memes.apply();
                     viewError("Đã hết phiên đăng nhập");
                 }
+                if (response.code() == 400) {
+                    try {
+                        viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
             }
 
             @Override
             public void onFailure(Call<Message> call, Throwable t) {
 
                 Log.e("TAG", "onFailure: " + t.getMessage());
-                viewSucc(mEdtUserName, "Không thể kết nối đến server!");
+                viewErrorExitApp();
 
             }
         });
@@ -208,5 +218,21 @@ public class LoginActivity extends AppCompatActivity {
         if(null != mProgressDialog ){
             mProgressDialog.dismiss();
         }
+    }
+
+    private void viewErrorExitApp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cảnh báo");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                System.exit(1);
+            }
+        });
+        AlertDialog mAlertDialog = builder.create();
+        mAlertDialog.show();
     }
 }

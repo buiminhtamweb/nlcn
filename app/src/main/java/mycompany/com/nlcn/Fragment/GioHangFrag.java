@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -160,12 +161,19 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
                         }
                         viewError(response.body().getMessage());
                     }
+                    if (response.code() == 400) {
+                        try {
+                            viewError(response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
                 }
 
                 @Override
                 public void onFailure(Call<Message> call, Throwable t) {
-                    viewError("Lỗi kết nối đến máy chủ \nVui lòng thử lại !");
+                    viewErrorExitApp();
                 }
             });
 
@@ -215,14 +223,18 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
                             mTvTongTien.setText("" + mGioHangRecyclerViewAdapter.getTongTien());
                             mAlertDialog.dismiss();
                         }
-                        if (response.isSuccessful() && response.code() == 400) {
-                            viewError(response.body().getMessage());
+                        if (response.code() == 400) {
+                            try {
+                                viewError(response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Message> call, Throwable t) {
-                        viewError("Lỗi kết nối đến máy chủ \nVui lòng thử lại !");
+                        viewErrorExitApp();
                     }
                 });
 
@@ -261,21 +273,29 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
                 api.capNhatSanLuongMuaSP(mCookies, idSanPham, idNguoiDung, sanLuongMua).enqueue(new Callback<Message>() {
                     @Override
                     public void onResponse(Call<Message> call, Response<Message> response) {
-                        if (null != response.body()) {
+                        if (null != response.body() && response.code() == 200) {
 
-                            if (response.body().getMessage().equals("successful")) {
+
                                 viewSucc(mTvTongTien, "Đã cập nhật thành công");
                                 mGioHang.get(position).setSanLuongMua(sanLuongMua);
                                 mGioHangRecyclerViewAdapter.notifyDataSetChanged();
                                 mTvTongTien.setText("" + mGioHangRecyclerViewAdapter.getTongTien());
                                 mAlertDialog.dismiss();
-                            } else viewError(response.body().getMessage());
+
                         }
+                        if (response.code() == 400 && null != response.errorBody()) {
+                            try {
+                                viewError(response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
 
                     @Override
                     public void onFailure(Call<Message> call, Throwable t) {
-
+                        viewErrorExitApp();
                     }
                 });
 
@@ -296,6 +316,21 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
         }
     }
 
+    private void viewErrorExitApp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Cảnh báo");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                System.exit(1);
+            }
+        });
+        AlertDialog mAlertDialog = builder.create();
+        mAlertDialog.show();
+    }
 
     private void viewError(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());

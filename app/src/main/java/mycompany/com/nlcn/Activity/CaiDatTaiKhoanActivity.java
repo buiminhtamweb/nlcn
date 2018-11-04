@@ -26,22 +26,18 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Data.ConnectServer;
-import mycompany.com.nlcn.MainActivity;
 import mycompany.com.nlcn.Model.Message;
 import mycompany.com.nlcn.Model.UserAcc;
 import mycompany.com.nlcn.R;
-import mycompany.com.nlcn.utils.RealPathUtil;
 import mycompany.com.nlcn.utils.SharedPreferencesHandler;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -90,7 +86,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         mBtnSDT = (Button) findViewById(R.id.btn_td_sdt);
         mBtnDiaChi = (Button) findViewById(R.id.btn_td_diachi);
 
-        mCookies = SharedPreferencesHandler.getString(this,Constant.PREF_COOKIES);
+        mCookies = SharedPreferencesHandler.getString(this, Constant.PREF_COOKIES);
 
         eventClick();
         loadData();
@@ -314,13 +310,13 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         mIdNguoiDung = SharedPreferencesHandler.getString(this, "id");
 
         //Lấy thông tin từ Server
-        ConnectServer.getInstance(this).getApi().layThongTinNguoiDung(mCookies,mIdNguoiDung).enqueue(new Callback<UserAcc>() {
+        ConnectServer.getInstance(this).getApi().layThongTinNguoiDung(mCookies, mIdNguoiDung).enqueue(new Callback<UserAcc>() {
             @Override
             public void onResponse(Call<UserAcc> call, Response<UserAcc> response) {
 
-                if (response.isSuccessful()){
+                if (response.isSuccessful() && response.code() == 200) {
                     UserAcc userAcc = response.body();
-                    Picasso.get().load(Constant.URL_SERVER+ userAcc.getAvatar())
+                    Picasso.get().load(Constant.URL_SERVER + userAcc.getAvatar())
                             .error(R.drawable.add)
                             .fit()
                             .centerCrop()
@@ -333,12 +329,19 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
                     if (userAcc.getGioitinh() != null)
                         mBtnGioiTinh.setText(userAcc.getGioitinh());
                 }
+                if (response.code() == 400) {
+                    try {
+                        viewErr(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
             }
 
             @Override
             public void onFailure(Call<UserAcc> call, Throwable t) {
-                viewErr("Lỗi không thể kết nối đến máy chủ");
+                viewErrorExitApp();
             }
         });
 
@@ -348,7 +351,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
     private void updateUser(final int type, final String data) {
 
-        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mCookies,mIdNguoiDung, type, data).enqueue(new Callback<Message>() {
+        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mCookies, mIdNguoiDung, type, data).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
 
@@ -359,9 +362,9 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
                     finish();
                 }
 
-                if(response.isSuccessful() && response.code()==200){
+                if (response.isSuccessful() && response.code() == 200) {
                     viewSucc(mBtnDiaChi, response.body().getMessage());
-                    switch (type){
+                    switch (type) {
                         case HO_TEN:
                             mBtnHoTen.setText(data);
                             break;
@@ -374,14 +377,18 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
                     }
 
 
-                }else if(response.isSuccessful() && response.code()==300){
-                    viewErr(response.body().getMessage());
+                } else if (response.isSuccessful() && response.code() == 400) {
+                    try {
+                        viewErr(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<Message> call, Throwable t) {
-                viewErr("Không thể kết nối đến máy chủ");
+                viewErrorExitApp();
 
             }
         });
@@ -390,7 +397,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
     }
 
     private void changePassWd(String oldPass, String newConfirmPass) {
-        ConnectServer.getInstance(this).getApi().capNhatMatKhau(mCookies,mIdNguoiDung, oldPass, newConfirmPass).enqueue(new Callback<Message>() {
+        ConnectServer.getInstance(this).getApi().capNhatMatKhau(mCookies, mIdNguoiDung, oldPass, newConfirmPass).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
 
@@ -401,10 +408,14 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
                     finish();
                 }
 
-                if(response.isSuccessful() && response.code()==200){
+                if (response.isSuccessful() && response.code() == 200) {
                     viewSucc(mBtnDiaChi, response.body().getMessage());
-                }else if(response.isSuccessful() && response.code()==300){
-                    viewErr(response.body().getMessage());
+                } else if (response.isSuccessful() && response.code() == 400) {
+                    try {
+                        viewErr(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -416,7 +427,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
     }
 
-    private void viewErr( String message) {
+    private void viewErr(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
         builder.setTitle("Cảnh báo");
         builder.setMessage(message);
@@ -457,7 +468,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         }
     }
 
-    public  void chooseImage(){
+    public void chooseImage() {
         checkPermistion();
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
@@ -474,9 +485,9 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
 
-               // bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                // bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
 
-                uploadImage(uri,bitmap);
+                uploadImage(uri, bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -489,7 +500,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
     }
 
     // Encode bitmap to String
-    public String getBitMap(Bitmap bmp){
+    public String getBitMap(Bitmap bmp) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, 50, baos);
         byte[] imageBytes = baos.toByteArray();
@@ -502,13 +513,13 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         viewProgressDialog("Đang upload ảnh ...");
 
         String imgCode = getBitMap(bitmap);
-        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mCookies,mIdNguoiDung,ANH_DAI_DIEN,imgCode).enqueue(new Callback<Message>() {
+        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mCookies, mIdNguoiDung, ANH_DAI_DIEN, imgCode).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
 //                Message message = response.body();
 
                 hideProgressDialog();
-                if (response.code()==200) {
+                if (response.code() == 200) {
 
                     Picasso.get().load(uri)
                             .error(R.drawable.add)
@@ -516,7 +527,8 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
                             .centerCrop()
                             .into(mImgAnhDaiDien);
                     viewSucc(mBtnDiaChi, "Đã cập nhật ảnh đại diện thành công");
-                } else {
+                }
+                if (response.code() == 400) {
                     viewErr("Lỗi !  Chưa cập nhập ảnh đại diện");
                 }
             }
@@ -528,17 +540,33 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         });
     }
 
-    private void viewProgressDialog(String message){
-        if(null == mProgressDialog ) {
+    private void viewProgressDialog(String message) {
+        if (null == mProgressDialog) {
             mProgressDialog = new ProgressDialog(this);
         }
         mProgressDialog.setMessage(message);
         mProgressDialog.show();
     }
 
-    private void hideProgressDialog(){
-        if(null != mProgressDialog ){
+    private void hideProgressDialog() {
+        if (null != mProgressDialog) {
             mProgressDialog.dismiss();
         }
+    }
+
+    private void viewErrorExitApp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cảnh báo");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                System.exit(1);
+            }
+        });
+        AlertDialog mAlertDialog = builder.create();
+        mAlertDialog.show();
     }
 }

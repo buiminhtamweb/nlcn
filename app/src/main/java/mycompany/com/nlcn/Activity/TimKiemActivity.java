@@ -118,7 +118,7 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
             @Override
             public void onFailure(Call<DataSanPham> call, Throwable t) {
                 Log.e("SEARCH", "onFailure: " + t.getMessage());
-                viewError("Lỗi kết nối đến máy chủ!");
+                viewErrorExitApp();
             }
         });
 
@@ -236,6 +236,22 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
             }
         });
         snackbar.show();
+    }
+
+    private void viewErrorExitApp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cảnh báo");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                System.exit(1);
+            }
+        });
+        AlertDialog mAlertDialog = builder.create();
+        mAlertDialog.show();
     }
 
 }

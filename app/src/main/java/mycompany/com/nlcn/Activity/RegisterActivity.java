@@ -1,13 +1,18 @@
 package mycompany.com.nlcn.Activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.io.IOException;
 
 import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.MainActivity;
@@ -59,19 +64,30 @@ public class RegisterActivity extends AppCompatActivity {
             call.enqueue(new Callback<Message>() {
                 @Override
                 public void onResponse(Call<Message> call, Response<Message> response) {
-                    Toast.makeText(getBaseContext(), "Dang ky thanh cong", Toast.LENGTH_LONG).show();
 
-                    Log.e("TAG", "onResponse: " + response.headers().toString());
-                    Log.e("TAG", "onResponse: " + response.body());
+                    if (response.code() == 200 && response.body() != null) {
+                        viewSucc(mDiaChi, response.body().getMessage());
+                        Intent i = new Intent(getBaseContext(), MainActivity.class);
+                        startActivity(i);
+                        Log.e("TAG", "onResponse: " + response.headers().toString());
+                        Log.e("TAG", "onResponse: " + response.body());
+                    }
 
-                    Intent i = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(i);
+                    if (response.code() == 400 && response.errorBody() != null) {
+                        try {
+                            viewError(response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                 }
 
                 @Override
                 public void onFailure(Call<Message> call, Throwable t) {
-                    Toast.makeText(getBaseContext(), "Loi ket noi Server", Toast.LENGTH_LONG).show();
-                    Log.e("TAG", "onResponse: " + "Loi ket noi Server");
+                    viewErrorExitApp();
+//                    Toast.makeText(getBaseContext(), "Loi ket noi Server", Toast.LENGTH_LONG).show();
+//                    Log.e("TAG", "onResponse: " + "Loi ket noi Server");
                 }
             });
         }
@@ -105,5 +121,40 @@ public class RegisterActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    private void viewErrorExitApp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cảnh báo");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                System.exit(1);
+            }
+        });
+        AlertDialog mAlertDialog = builder.create();
+        mAlertDialog.show();
+    }
+
+    private void viewError(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cảnh báo");
+        builder.setMessage(message);
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog mAlertDialog = builder.create();
+        mAlertDialog.show();
+    }
+
+    private void viewSucc(View view, String message) {
+        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
     }
 }

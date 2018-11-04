@@ -1,5 +1,6 @@
 package mycompany.com.nlcn.Activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,12 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,16 +38,14 @@ import retrofit2.Response;
 public class LichSuDatHangActivity extends AppCompatActivity implements DonHangRecyclerViewAdapter.onClickListener,
         DonHangRecyclerViewAdapter.onScrollListener {
 
+    AlertDialog mDialogAgriList;
     private RecyclerView mRecyclerView;
     private List<ItemDonhang> mDonHangs = new ArrayList<>();
     private DonHangRecyclerViewAdapter mDonHangRecyclerViewAdapter;
-
     private String mIDNguoiDung;
     private int mPageCurrent;
     private int mNumPage;
-
     private String mCookies;
-    AlertDialog mDialogAgriList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,7 +91,7 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
                         finish();
                     }
 
-                    for (ItemDonhang item : response.body().getDonhangs() ) {
+                    for (ItemDonhang item : response.body().getDonhangs()) {
 //                        Log.e("LS_DH", "onResponse: " + item.getId());
                         mDonHangs.add(item);
 
@@ -103,6 +102,14 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
                     mNumPage = response.body().getNumpages();
 
                     mDonHangRecyclerViewAdapter.notifyDataSetChanged();
+                }
+
+                if (response.code() == 400) {
+                    try {
+                        viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -160,22 +167,22 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
         final TextView tvIDDonHang = (TextView) dialogView.findViewById(R.id.textView_id_don_hang);
 //        TextView tvSoLuongSPMua = (TextView) dialogView.findViewById(R.id.textView_so_luong_sp_mua);
         final TextView tvTongTien = (TextView) dialogView.findViewById(R.id.textView_tong_gia_don_hang);
-        final TextView tvNgayMua = (TextView)dialogView.findViewById(R.id.textView_ngay_mua);
-        final TextView tvNgayDuyet = (TextView)dialogView.findViewById(R.id.textView_ngay_duyet);
+        final TextView tvNgayMua = (TextView) dialogView.findViewById(R.id.textView_ngay_mua);
+        final TextView tvNgayDuyet = (TextView) dialogView.findViewById(R.id.textView_ngay_duyet);
         //Lấy thông tin giỏ hàng
-        ConnectServer.getInstance(getBaseContext()).getApi().layChiTietDonHang(mCookies,idDonHang).enqueue(new Callback<DonHangRes>() {
+        ConnectServer.getInstance(getBaseContext()).getApi().layChiTietDonHang(mCookies, idDonHang).enqueue(new Callback<DonHangRes>() {
             @Override
             public void onResponse(Call<DonHangRes> call, Response<DonHangRes> response) {
-                if (response.isSuccessful() && response.code() ==200){
+                if (response.isSuccessful() && response.code() == 200) {
 
-                    tvIDDonHang.setText("Mã đơn hàng: "+ response.body().getId());
-                    tvNgayMua.setText("Ngày đặt hàng: "+response.body().getNgayDatHang());
-                    tvTongTien.setText("Tổng tiền đơn hàng: "+ response.body().getTongTien()+ " VND");
-                    tvNgayDuyet.setText("Ngày duyệt: " + response.body().getNgayDuyetDH() );
+                    tvIDDonHang.setText("Mã đơn hàng: " + response.body().getId());
+                    tvNgayMua.setText("Ngày đặt hàng: " + response.body().getNgayDatHang());
+                    tvTongTien.setText("Tổng tiền đơn hàng: " + response.body().getTongTien() + " VND");
+                    tvNgayDuyet.setText("Ngày duyệt: " + response.body().getNgayDuyetDH());
                     tvNgayDuyet.setVisibility(View.VISIBLE);
                     for (final SpMua spMua : response.body().getSpMua()) {
 
-                        ConnectServer.getInstance(getBaseContext()).getApi().layItemSPDonHang(mCookies,spMua.getIdSpMua()).enqueue(new Callback<ItemSPDonHang>() {
+                        ConnectServer.getInstance(getBaseContext()).getApi().layItemSPDonHang(mCookies, spMua.getIdSpMua()).enqueue(new Callback<ItemSPDonHang>() {
                             @Override
                             public void onResponse(Call<ItemSPDonHang> call, Response<ItemSPDonHang> response) {
                                 if (null != response.body()) {
@@ -201,7 +208,7 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
 
             @Override
             public void onFailure(Call<DonHangRes> call, Throwable t) {
-
+                viewErrorExitApp();
             }
         });
 
@@ -219,7 +226,7 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
     @Override
     protected void onStop() {
         super.onStop();
-        if(mDialogAgriList != null && mDialogAgriList.isShowing()){
+        if (mDialogAgriList != null && mDialogAgriList.isShowing()) {
             mDialogAgriList.cancel();
         }
     }
@@ -227,11 +234,43 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(mDialogAgriList != null && mDialogAgriList.isShowing()){
+        if (mDialogAgriList != null && mDialogAgriList.isShowing()) {
             mDialogAgriList.cancel();
-        }else {
+        } else {
             finish();
         }
 
+    }
+
+    private void viewError(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cảnh báo");
+        builder.setMessage(message);
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+
+    private void viewErrorExitApp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cảnh báo");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                System.exit(1);
+            }
+        });
+        AlertDialog mAlertDialog = builder.create();
+        mAlertDialog.show();
     }
 }

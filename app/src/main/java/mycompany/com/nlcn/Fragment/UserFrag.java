@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -138,7 +139,7 @@ public class UserFrag extends Fragment {
             public void onResponse(Call<UserAcc> call, @NonNull Response<UserAcc> response) {
 
                 if (response.code() == 401) {
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    Intent intent = new Intent(getContext(), LoginActivity.class);
                     intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
                     startActivity(intent);
                     getActivity().finish();
@@ -156,11 +157,19 @@ public class UserFrag extends Fragment {
                     mTvSDT.setText(userAcc.getSdt());
                     mTvDiaChi.setText(userAcc.getDiachi());
                 }
+
+                if (response.code() == 400) {
+                    try {
+                        viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
             @Override
             public void onFailure(Call<UserAcc> call, Throwable t) {
-
+                viewErrorExitApp();
             }
         });
     }
@@ -218,7 +227,21 @@ public class UserFrag extends Fragment {
 
     }
 
-
+    private void viewErrorExitApp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Cảnh báo");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                System.exit(1);
+            }
+        });
+        AlertDialog mAlertDialog = builder.create();
+        mAlertDialog.show();
+    }
 
     private void viewError(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
