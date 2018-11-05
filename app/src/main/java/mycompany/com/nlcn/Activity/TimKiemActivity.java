@@ -241,7 +241,7 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
     private void viewErrorExitApp() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Cảnh báo");
-        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \nThoát ứng dụng.");
         builder.setCancelable(false);
         builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
             @Override

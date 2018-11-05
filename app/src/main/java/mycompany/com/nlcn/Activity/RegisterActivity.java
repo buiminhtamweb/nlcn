@@ -67,10 +67,12 @@ public class RegisterActivity extends AppCompatActivity {
 
                     if (response.code() == 200 && response.body() != null) {
                         viewSucc(mDiaChi, response.body().getMessage());
-                        Intent i = new Intent(getBaseContext(), MainActivity.class);
+                        Intent i = new Intent(getBaseContext(), LoginActivity.class);
                         startActivity(i);
                         Log.e("TAG", "onResponse: " + response.headers().toString());
                         Log.e("TAG", "onResponse: " + response.body());
+
+
                     }
 
                     if (response.code() == 400 && response.errorBody() != null) {
@@ -126,7 +128,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void viewErrorExitApp() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Cảnh báo");
-        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \nThoát ứng dụng.");
         builder.setCancelable(false);
         builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
             @Override

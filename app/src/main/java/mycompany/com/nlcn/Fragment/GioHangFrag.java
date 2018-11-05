@@ -211,7 +211,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
 
                         if (response.code() == 401) {
                             Intent intent = new Intent(getActivity(), LoginActivity.class);
-                            intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                            intent.putExtra("message", "Phiên làm việc hết hạn \nVui lòng đăng nhập lại");
                             startActivity(intent);
                             getActivity().finish();
                         }
@@ -319,7 +319,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     private void viewErrorExitApp() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Cảnh báo");
-        builder.setMessage("Không thể kết nối đến máy chủ ! \n Thoát ứng dụng.");
+        builder.setMessage("Không thể kết nối đến máy chủ ! \nThoát ứng dụng.");
         builder.setCancelable(false);
         builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
             @Override
