@@ -17,8 +17,7 @@
         app:titleTextColor="@color/white">
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="40dp"
+            android:layout_height="36dp"
             android:layout_marginEnd="48dp"
             android:background="@drawable/backround_edittext">
 
@@ -31,6 +30,7 @@
                 android:gravity="center"
                 android:hint="Tìm kiếm"
                 android:textStyle="italic"
+                style="@style/EditTextCustomHolo"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/img_ic_search"
                 app:layout_constraintStart_toStartOf="parent"

@@ -357,7 +357,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
                 if (response.code() == 401) {
                     Intent intent = new Intent(getBaseContext(), LoginActivity.class);
-                    intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                    intent.putExtra("message", "Phiên làm việc hết hạn \nVui lòng đăng nhập lại");
                     startActivity(intent);
                     finish();
                 }
@@ -374,15 +374,25 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
                         case DIA_CHI:
                             mBtnDiaChi.setText(data);
                             break;
+                        case NGAY_SINH:
+                            mBtnNamSinh.setText(data);
+                            break;
+                        case GIOI_TINH:
+                            mBtnGioiTinh.setText(data);
+                            break;
                     }
 
 
-                } else if (response.isSuccessful() && response.code() == 400) {
+                }
+                if (response.isSuccessful() && response.code() == 400) {
                     try {
                         viewErr(response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                }
+                if (response.isSuccessful() && response.code() == 413) {
+                    viewErr("Tập tin ảnh quá lớn");
                 }
             }
 
@@ -403,7 +413,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
                 if (response.code() == 401) {
                     Intent intent = new Intent(getBaseContext(), LoginActivity.class);
-                    intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                    intent.putExtra("message", "Phiên làm việc hết hạn \nVui lòng đăng nhập lại");
                     startActivity(intent);
                     finish();
                 }
@@ -530,11 +540,15 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
                 if (response.code() == 400) {
                     viewErr("Lỗi !  Chưa cập nhập ảnh đại diện");
                 }
+                if (response.isSuccessful() && response.code() == 413) {
+                    viewErr("Tập tin ảnh quá lớn");
+                }
             }
 
             @Override
             public void onFailure(Call<Message> call, Throwable t) {
                 Log.e("UPLOAD_IMG", t.getMessage());
+                viewErrorExitApp();
             }
         });
     }
