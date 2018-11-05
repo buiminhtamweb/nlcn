@@ -558,6 +558,8 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
             mProgressDialog = new ProgressDialog(this);
         }
         mProgressDialog.setMessage(message);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCanceledOnTouchOutside(false);
         mProgressDialog.show();
     }
 

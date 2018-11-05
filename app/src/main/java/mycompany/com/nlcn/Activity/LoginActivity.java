@@ -145,7 +145,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor memes = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
                     memes.clear();
                     memes.apply();
-                    viewError("Đã hết phiên đăng nhập");
+                    viewError("Đã hết phiên đăng nhập \nVui lòng đăng nhập lại");
                 }
                 if (response.code() == 400) {
                     try {
@@ -173,10 +173,11 @@ public class LoginActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (null != bundle) {
             String messsage = bundle.getString("message", null);
-            if (messsage != null)
+            if (messsage != null) {
                 viewError(messsage);
-        } else if (SharedPreferencesHandler.getBoolean(mContext, "remember_me")) {
-            kiemTraDangNhap();
+            } else if (SharedPreferencesHandler.getBoolean(mContext, "remember_me")) {
+                kiemTraDangNhap();
+            }
         }
 
     }
@@ -212,6 +213,7 @@ public class LoginActivity extends AppCompatActivity {
             mProgressDialog = new ProgressDialog(this);
         }
         mProgressDialog.setMessage(message);
+        mProgressDialog.setCancelable(false);
         mProgressDialog.show();
     }
 

@@ -1,4 +1,6 @@
 package mycompany.com.nlcn.Activity;
+
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,12 +12,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import mycompany.com.nlcn.Adapter.SanPhamRecyclerViewAdapter;
@@ -46,6 +52,7 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
     private EditText mEdtKeyWord;
     private String mCookies;
     private String mKeyWord;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,6 +77,17 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
 
 
         mEdtKeyWord = (EditText) findViewById(R.id.editText_search);
+        mEdtKeyWord.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    mKeyWord = mEdtKeyWord.getText().toString();
+                    timKiem(mKeyWord, 1);
+                    return true;
+                }
+                return false;
+            }
+        });
         mImgSearch = (ImageView) findViewById(R.id.img_ic_search);
         mImgSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,11 +114,13 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
 
 
     private void timKiem(String keyWord,int page) {
-
+        viewProgressDialog("Đang tìm kiếm...");
+        mSanPhams.clear();
         ConnectServer.getInstance(this).getApi().timKiem(keyWord, page).enqueue(new Callback<DataSanPham>() {
             @Override
             public void onResponse(Call<DataSanPham> call, Response<DataSanPham> response) {
-                if (null != response) {
+                hideProgressDialog();
+                if (null != response && response.code() == 200) {
                     mPageCurrent = Integer.parseInt(response.body().getPage());
                     mNumPage = response.body().getNumpages();
 
@@ -110,6 +130,14 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
                     }
                     mSanPhamRecyclerViewAdapter.notifyDataSetChanged();
                     Log.e("SEARCH", "onResponse: Succ");
+                }
+
+                if (response.code() == 400) {
+                    try {
+                        viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
@@ -252,6 +280,22 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
         });
         AlertDialog mAlertDialog = builder.create();
         mAlertDialog.show();
+    }
+
+    private void viewProgressDialog(String message) {
+        if (null == mProgressDialog) {
+            mProgressDialog = new ProgressDialog(this);
+        }
+        mProgressDialog.setMessage(message);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCanceledOnTouchOutside(false);
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (null != mProgressDialog) {
+            mProgressDialog.dismiss();
+        }
     }
 
 }

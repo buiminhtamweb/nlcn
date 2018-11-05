@@ -22,6 +22,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import mycompany.com.nlcn.Activity.CaiDatTaiKhoanActivity;
@@ -140,9 +141,9 @@ public class UserFrag extends Fragment {
 
                 if (response.code() == 401) {
                     Intent intent = new Intent(getContext(), LoginActivity.class);
-                    intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
+                    intent.putExtra("message", "Phiên làm việc hết hạn \nVui lòng đăng nhập lại");
                     startActivity(intent);
-                    getActivity().finish();
+                    Objects.requireNonNull(getActivity()).finish();
                 }
 
                 if (response.isSuccessful() && response.code() == 200) {
