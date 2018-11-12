@@ -47,7 +47,7 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
     private String mIDNguoiDung;
     private int mPageCurrent;
     private int mNumPage;
-    private String mCookies;
+    private String mToken;
     private AlertDialog mDialogAgriList;
 
     @Override
@@ -75,7 +75,7 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
         mDonHangRecyclerViewAdapter.setOnScrollListener(this);
         mRecyclerView.setAdapter(mDonHangRecyclerViewAdapter);
 
-        mCookies = SharedPreferencesHandler.getString(getBaseContext(), Constant.PREF_COOKIES);
+        mToken = SharedPreferencesHandler.getString(getBaseContext(), Constant.TOKEN);
         layDonHang(1);
 
     }
@@ -83,7 +83,7 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
 
     private void layDonHang(int page) {
         mIDNguoiDung = SharedPreferencesHandler.getString(this, "id");
-        ConnectServer.getInstance(this).getApi().layDSDonHang(mCookies, mIDNguoiDung, false, page).enqueue(new Callback<DSDonHang>() {
+        ConnectServer.getInstance(this).getApi().layDSDonHang(mToken, false, page).enqueue(new Callback<DSDonHang>() {
             @Override
             public void onResponse(Call<DSDonHang> call, @NonNull Response<DSDonHang> response) {
 
@@ -158,7 +158,7 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
         final TextView tvTongTien = (TextView) dialogView.findViewById(R.id.textView_tong_gia_don_hang);
         final TextView tvNgayMua = (TextView) dialogView.findViewById(R.id.textView_ngay_mua);
         //Lấy thông tin giỏ hàng
-        ConnectServer.getInstance(getBaseContext()).getApi().layChiTietDonHang(mCookies, idDonHang).enqueue(new Callback<DonHangRes>() {
+        ConnectServer.getInstance(getBaseContext()).getApi().layChiTietDonHang(mToken, idDonHang).enqueue(new Callback<DonHangRes>() {
             @Override
             public void onResponse(Call<DonHangRes> call, Response<DonHangRes> response) {
                 if (response.isSuccessful() && response.code() == 200) {
@@ -168,7 +168,7 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
                     tvTongTien.setText("Tổng tiền đơn hàng: " + response.body().getTongTien() + " VND");
                     for (final SpMua spMua : response.body().getSpMua()) {
 
-                        ConnectServer.getInstance(getBaseContext()).getApi().layItemSPDonHang(mCookies, spMua.getIdSpMua()).enqueue(new Callback<ItemSPDonHang>() {
+                        ConnectServer.getInstance(getBaseContext()).getApi().layItemSPDonHang(mToken, spMua.getIdSpMua()).enqueue(new Callback<ItemSPDonHang>() {
                             @Override
                             public void onResponse(Call<ItemSPDonHang> call, Response<ItemSPDonHang> response) {
                                 if (null != response.body()) {

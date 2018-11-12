@@ -4,9 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,12 +13,9 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-import java.io.IOException;
-
 import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.MainActivity;
-import mycompany.com.nlcn.Model.Message;
 import mycompany.com.nlcn.Model.ResLogin;
 import mycompany.com.nlcn.R;
 import mycompany.com.nlcn.utils.SharedPreferencesHandler;
@@ -38,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
     private Snackbar mSnackbar;
     private ProgressDialog mProgressDialog;
 
-    private String mCookies = "";
+    private String mToken = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +44,10 @@ public class LoginActivity extends AppCompatActivity {
         mCBRememberMe = (CheckBox) findViewById(R.id.cb_remember);
         mContext = this.getApplicationContext();
 
-        mCookies = SharedPreferencesHandler.getString(mContext,Constant.PREF_COOKIES);
+        mToken = SharedPreferencesHandler.getString(mContext, Constant.TOKEN);
 
-        mEdtUserName.setText(SharedPreferencesHandler.getString(mContext, "username"));
-        mEdtPassword.setText(SharedPreferencesHandler.getString(mContext, "password"));
+        mEdtUserName.setText(SharedPreferencesHandler.getString(mContext, Constant.USER_NAME));
+        mEdtPassword.setText(SharedPreferencesHandler.getString(mContext, Constant.PASSWORD));
 
 
     }
@@ -61,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         viewProgressDialog("Đang đăng nhập ... ");
         if (checkNullDangNhap()) {
 
-            Call<ResLogin> call = ConnectServer.getInstance(mContext).getApi().signInAcc(mCookies,
+            Call<ResLogin> call = ConnectServer.getInstance(mContext).getApi().signInAcc(mToken,
                     mEdtUserName.getText().toString(),
                     mEdtPassword.getText().toString());
 
@@ -74,21 +69,19 @@ public class LoginActivity extends AppCompatActivity {
 
                             if (mCBRememberMe.isChecked()) {
 
-                                SharedPreferencesHandler.writeString(mContext, "username", mEdtUserName.getText().toString());
-                                SharedPreferencesHandler.writeString(mContext, "password", mEdtPassword.getText().toString());
+                                SharedPreferencesHandler.writeString(mContext, Constant.USER_NAME, mEdtUserName.getText().toString());
+//                                SharedPreferencesHandler.writeString(mContext, Constant.PASSWORD, mEdtPassword.getText().toString());
                                 SharedPreferencesHandler.writeBoolean(mContext, "remember_me", true);
 
                             }
 
-//                        Toast.makeText(mContext, response.body().getSERVERMESSAGE(), Toast.LENGTH_SHORT).show();
 
-                            Log.e("LOGIN", "onResponse: COOKIE: " + response.headers().get("Set-Cookie") );
+                            Log.e("LOGIN", "onResponse: TOKEN: " + response.body().getTOKEN());
 
-
-                            SharedPreferencesHandler.writeString(mContext, Constant.PREF_COOKIES, response.headers().get("Set-Cookie"));
 
                             viewSucc(mCBRememberMe, "Đã đăng nhập thành công");
-                            SharedPreferencesHandler.writeString(mContext, "id", response.body().getID());
+                            SharedPreferencesHandler.writeString(mContext, Constant.USER_NAME, mEdtUserName.getText().toString());
+                            SharedPreferencesHandler.writeString(mContext, Constant.TOKEN, response.body().getTOKEN());
                             Intent i = new Intent(mContext, MainActivity.class);
                             startActivity(i);
                             finish();
@@ -126,46 +119,46 @@ public class LoginActivity extends AppCompatActivity {
         } else return true;
     }
 
-    private void kiemTraDangNhap() {
-        viewProgressDialog("Đang đăng nhập ....");
-
-        ConnectServer.getInstance(getApplicationContext()).getApi().kiemTraTrangThaiDangNhap(mCookies).enqueue(new Callback<Message>() {
-            @Override
-            public void onResponse(Call<Message> call, Response<Message> response) {
-                Log.e("TAG", "onResponse: " + response.code());
-                hideProgressDialog();
-
-                if (response.code() == 200) {
-                    Intent i = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(i);
-                    viewSucc(mEdtUserName, "Đã đăng nhập");
-                    finish();
-
-                } else if (response.code() == 401) {
-                    SharedPreferences.Editor memes = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-                    memes.clear();
-                    memes.apply();
-                    viewError("Đã hết phiên đăng nhập \nVui lòng đăng nhập lại");
-                }
-                if (response.code() == 400) {
-                    try {
-                        viewError(response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<Message> call, Throwable t) {
-
-                Log.e("TAG", "onFailure: " + t.getMessage());
-                viewErrorExitApp();
-
-            }
-        });
-    }
+//    private void kiemTraDangNhap() {
+//        viewProgressDialog("Đang đăng nhập ....");
+//
+//        ConnectServer.getInstance(getApplicationContext()).getApi().kiemTraTrangThaiDangNhap(mToken).enqueue(new Callback<Message>() {
+//            @Override
+//            public void onResponse(Call<Message> call, Response<Message> response) {
+//                Log.e("TAG", "onResponse: " + response.code());
+//                hideProgressDialog();
+//
+//                if (response.code() == 200) {
+//                    Intent i = new Intent(getBaseContext(), MainActivity.class);
+//                    startActivity(i);
+//                    viewSucc(mEdtUserName, "Đã đăng nhập");
+//                    finish();
+//
+//                } else if (response.code() == 401) {
+//                    SharedPreferences.Editor memes = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+//                    memes.clear();
+//                    memes.apply();
+//                    viewError("Đã hết phiên đăng nhập \nVui lòng đăng nhập lại");
+//                }
+//                if (response.code() == 400) {
+//                    try {
+//                        viewError(response.errorBody().string());
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Message> call, Throwable t) {
+//
+//                Log.e("TAG", "onFailure: " + t.getMessage());
+//                viewErrorExitApp();
+//
+//            }
+//        });
+//    }
 
     @Override
     protected void onStart() {
@@ -176,7 +169,8 @@ public class LoginActivity extends AppCompatActivity {
             if (messsage != null) {
                 viewError(messsage);
             } else if (SharedPreferencesHandler.getBoolean(mContext, "remember_me")) {
-                kiemTraDangNhap();
+//                kiemTraDangNhap();
+                startActivity(new Intent(this, MainActivity.class));
             }
         }
 

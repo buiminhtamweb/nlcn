@@ -47,8 +47,8 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
     private int mNumPage;
     private API mApi;
     private AlertDialog mAlertDialog;
-    private String idNguoiDung = "";
-    private String mCookies;
+    private String mUsername = "";
+    private String mToken;
     private TextView mTvSearch;
 
     @Nullable
@@ -56,8 +56,8 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.frag_home, container, false);
 
-        mCookies = SharedPreferencesHandler.getString(getActivity(), Constant.PREF_COOKIES);
-        idNguoiDung = SharedPreferencesHandler.getString(getActivity(), "id");
+        mToken = SharedPreferencesHandler.getString(getActivity(), Constant.TOKEN);
+        mUsername = SharedPreferencesHandler.getString(getActivity(), Constant.USER_NAME);
 
         mTvSearch = v.findViewById(R.id.tv_seach);
         mTvSearch.setOnClickListener(new View.OnClickListener() {
@@ -166,7 +166,7 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
                 int sanLuongMua = Integer.parseInt(edtSanLuong.getText().toString());
                 ConnectServer.getInstance(getActivity())
                         .getApi()
-                        .themSPVaoGioHang(mCookies, mIdSP, idNguoiDung, sanLuongMua)
+                        .themSPVaoGioHang(mToken, mIdSP, sanLuongMua)
                         .enqueue(new Callback<Message>() {
                             @Override
                             public void onResponse(Call<Message> call, Response<Message> response) {
@@ -201,7 +201,7 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
             }
         });
         dialogBuilder.setView(dialogView);
-        dialogBuilder.setTitle("Đặt hàng");
+        dialogBuilder.setTitle("Thêm vào giỏ hàng");
         mAlertDialog = dialogBuilder.create();
         mAlertDialog.show();
     }

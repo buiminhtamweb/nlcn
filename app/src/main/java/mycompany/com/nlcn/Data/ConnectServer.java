@@ -18,15 +18,15 @@ public class ConnectServer {
 
 
     private ConnectServer(Context context) {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+//        OkHttpClient.Builder builder = new OkHttpClient.Builder();
 //        builder.addInterceptor(new AddCookiesInterceptor(context)); // VERY VERY IMPORTANT
-        builder.addInterceptor(new ReceivedCookiesInterceptor(context)); // VERY VERY IMPORTANT
-        OkHttpClient mClient = builder.build();
-        CookieJar cookieHandler = mClient.cookieJar();
-        cookieHandler.toString();
+//        builder.addInterceptor(new ReceivedCookiesInterceptor(context)); // VERY VERY IMPORTANT
+//        OkHttpClient mClient = builder.build();
+//        CookieJar cookieHandler = mClient.cookieJar();
+//        cookieHandler.toString();
 
         mRetrofit = new Retrofit.Builder()
-                .baseUrl(Constant.URL_SERVER+ "android/")
+                .baseUrl(Constant.URL_SERVER + "api/")
 //                .client(mClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

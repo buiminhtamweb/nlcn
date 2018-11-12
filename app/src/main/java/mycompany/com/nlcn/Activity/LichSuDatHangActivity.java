@@ -45,7 +45,7 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
     private String mIDNguoiDung;
     private int mPageCurrent;
     private int mNumPage;
-    private String mCookies;
+    private String mToken;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,13 +73,13 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
         mDonHangRecyclerViewAdapter.setOnClickListener(this);
         mRecyclerView.setAdapter(mDonHangRecyclerViewAdapter);
 
-        mCookies = SharedPreferencesHandler.getString(getBaseContext(), Constant.PREF_COOKIES);
+        mToken = SharedPreferencesHandler.getString(getBaseContext(), Constant.TOKEN);
         layDonHang(1);
     }
 
     private void layDonHang(int page) {
         mIDNguoiDung = SharedPreferencesHandler.getString(this, "id");
-        ConnectServer.getInstance(this).getApi().layDSDonHang(mCookies, mIDNguoiDung, true, page).enqueue(new Callback<DSDonHang>() {
+        ConnectServer.getInstance(this).getApi().layDSDonHang(mToken, true, page).enqueue(new Callback<DSDonHang>() {
             @Override
             public void onResponse(Call<DSDonHang> call, @NonNull Response<DSDonHang> response) {
                 if (response.isSuccessful() && response.code() == 200) {
@@ -170,7 +170,7 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
         final TextView tvNgayMua = (TextView) dialogView.findViewById(R.id.textView_ngay_mua);
         final TextView tvNgayDuyet = (TextView) dialogView.findViewById(R.id.textView_ngay_duyet);
         //Lấy thông tin giỏ hàng
-        ConnectServer.getInstance(getBaseContext()).getApi().layChiTietDonHang(mCookies, idDonHang).enqueue(new Callback<DonHangRes>() {
+        ConnectServer.getInstance(getBaseContext()).getApi().layChiTietDonHang(mToken, idDonHang).enqueue(new Callback<DonHangRes>() {
             @Override
             public void onResponse(Call<DonHangRes> call, Response<DonHangRes> response) {
                 if (response.isSuccessful() && response.code() == 200) {
@@ -182,7 +182,7 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
                     tvNgayDuyet.setVisibility(View.VISIBLE);
                     for (final SpMua spMua : response.body().getSpMua()) {
 
-                        ConnectServer.getInstance(getBaseContext()).getApi().layItemSPDonHang(mCookies, spMua.getIdSpMua()).enqueue(new Callback<ItemSPDonHang>() {
+                        ConnectServer.getInstance(getBaseContext()).getApi().layItemSPDonHang(mToken, spMua.getIdSpMua()).enqueue(new Callback<ItemSPDonHang>() {
                             @Override
                             public void onResponse(Call<ItemSPDonHang> call, Response<ItemSPDonHang> response) {
                                 if (null != response.body()) {

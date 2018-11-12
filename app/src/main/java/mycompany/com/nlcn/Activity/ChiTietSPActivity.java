@@ -38,7 +38,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
     private TextView mTenSanPham, mGiaSanPham, mSanLuongSP, mChiTietSP;
     private AlertDialog alertDialog = null;
     private AlertDialog mAlertDialog;
-    private String mCookies;
+    private String mToken;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,7 +49,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
         if (null != intent) {
             mIdSP = intent.getExtras().getString("idSP", "");
         } else finish();
-        mCookies = SharedPreferencesHandler.getString(getBaseContext(), Constant.PREF_COOKIES);
+        mToken = SharedPreferencesHandler.getString(getBaseContext(), Constant.TOKEN);
         idNguoiDung = SharedPreferencesHandler.getString(this, "id");
 
         mImageView = (ImageView) findViewById(R.id.img_agri);
@@ -150,7 +150,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
 
                 int sanLuongMua = Integer.parseInt(edtSanLuong.getText().toString());
 
-                ConnectServer.getInstance(getApplicationContext()).getApi().themSPVaoGioHang(mCookies, mIdSP, idNguoiDung, sanLuongMua)
+                ConnectServer.getInstance(getApplicationContext()).getApi().themSPVaoGioHang(mToken, mIdSP, sanLuongMua)
                         .enqueue(new Callback<Message>() {
                             @Override
                             public void onResponse(Call<Message> call, Response<Message> response) {

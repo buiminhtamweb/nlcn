@@ -12,16 +12,16 @@ public class ResLogin {
     @Expose
     private String sERVERMESSAGE;
 
-    @SerializedName("ID")
+    @SerializedName("TOKEN")
     @Expose
-    private String ID;
+    private String TOKEN;
 
-    public String getID() {
-        return ID;
+    public String getTOKEN() {
+        return TOKEN;
     }
 
-    public void setID(String ID) {
-        this.ID = ID;
+    public void setTOKEN(String TOKEN) {
+        this.TOKEN = TOKEN;
     }
 
     public Integer getSERVERRESPONSE() {

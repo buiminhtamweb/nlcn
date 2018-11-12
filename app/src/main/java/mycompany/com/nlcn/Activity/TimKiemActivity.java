@@ -46,11 +46,10 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
     private int mPageCurrent;
     private int mNumPage;
     private AlertDialog mAlertDialog;
-    private String idNguoiDung = "";
 
     private ImageView mImgSearch;
     private EditText mEdtKeyWord;
-    private String mCookies;
+    private String mToken;
     private String mKeyWord;
     private ProgressDialog mProgressDialog;
 
@@ -59,8 +58,7 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tim_kiem);
 
-        mCookies = SharedPreferencesHandler.getString(this, Constant.PREF_COOKIES);
-        idNguoiDung = SharedPreferencesHandler.getString(this, "id");
+        mToken = SharedPreferencesHandler.getString(this, Constant.TOKEN);
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -196,7 +194,7 @@ public class TimKiemActivity extends AppCompatActivity implements SanPhamRecycle
                 int sanLuongMua = Integer.parseInt(edtSanLuong.getText().toString());
                 ConnectServer.getInstance(TimKiemActivity.this)
                         .getApi()
-                        .themSPVaoGioHang(mCookies, mIdSP, idNguoiDung, sanLuongMua)
+                        .themSPVaoGioHang(mToken, mIdSP, sanLuongMua)
                         .enqueue(new Callback<Message>() {
                             @Override
                             public void onResponse(Call<Message> call, Response<Message> response) {

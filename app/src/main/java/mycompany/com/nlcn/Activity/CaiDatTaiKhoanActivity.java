@@ -55,8 +55,8 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
     private CircleImageView mImgAnhDaiDien;
     private Button mBtnHoTen, mBtnDoiMK, mBtnNamSinh, mBtnGioiTinh, mBtnSDT, mBtnDiaChi;
 
-    private String mIdNguoiDung;
-    private String mCookies;
+    private String mUsername;
+    private String mToken;
 
     private ProgressDialog mProgressDialog;
 
@@ -86,7 +86,8 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         mBtnSDT = (Button) findViewById(R.id.btn_td_sdt);
         mBtnDiaChi = (Button) findViewById(R.id.btn_td_diachi);
 
-        mCookies = SharedPreferencesHandler.getString(this, Constant.PREF_COOKIES);
+        mToken = SharedPreferencesHandler.getString(this, Constant.TOKEN);
+        mUsername = SharedPreferencesHandler.getString(this, Constant.USER_NAME);
 
         eventClick();
         loadData();
@@ -306,11 +307,9 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
     //Data
     private void loadData() {
-        //Lấy ID từ SharedPreferences
-        mIdNguoiDung = SharedPreferencesHandler.getString(this, "id");
 
         //Lấy thông tin từ Server
-        ConnectServer.getInstance(this).getApi().layThongTinNguoiDung(mCookies, mIdNguoiDung).enqueue(new Callback<UserAcc>() {
+        ConnectServer.getInstance(this).getApi().layThongTinNguoiDung(mToken, mUsername).enqueue(new Callback<UserAcc>() {
             @Override
             public void onResponse(Call<UserAcc> call, Response<UserAcc> response) {
 
@@ -351,7 +350,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
 
     private void updateUser(final int type, final String data) {
 
-        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mCookies, mIdNguoiDung, type, data).enqueue(new Callback<Message>() {
+        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mToken, mUsername, type, data).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
 
@@ -407,7 +406,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
     }
 
     private void changePassWd(String oldPass, String newConfirmPass) {
-        ConnectServer.getInstance(this).getApi().capNhatMatKhau(mCookies, mIdNguoiDung, oldPass, newConfirmPass).enqueue(new Callback<Message>() {
+        ConnectServer.getInstance(this).getApi().capNhatMatKhau(mToken, mUsername, oldPass, newConfirmPass).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
 
@@ -523,7 +522,7 @@ public class CaiDatTaiKhoanActivity extends AppCompatActivity {
         viewProgressDialog("Đang upload ảnh ...");
 
         String imgCode = getBitMap(bitmap);
-        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mCookies, mIdNguoiDung, ANH_DAI_DIEN, imgCode).enqueue(new Callback<Message>() {
+        ConnectServer.getInstance(this).getApi().capNhatThongTinNguoiDung(mToken, mUsername, ANH_DAI_DIEN, imgCode).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
 

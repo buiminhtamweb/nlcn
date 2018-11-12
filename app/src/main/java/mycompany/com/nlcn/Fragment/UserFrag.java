@@ -2,8 +2,6 @@ package mycompany.com.nlcn.Fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,12 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -40,9 +36,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class UserFrag extends Fragment {
-    private String mIdNguoiDung = "";
+    private String mUsername = "";
 
-    private String mCookies;
+    private String mToken;
 
     private CircleImageView mCircleImageView;
     private TextView mTvHoTen, mTvSDT, mTvDiaChi;
@@ -54,8 +50,8 @@ public class UserFrag extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_user, container, false);
 
-        mCookies = SharedPreferencesHandler.getString(getActivity(), Constant.PREF_COOKIES);
-        mIdNguoiDung = SharedPreferencesHandler.getString(getActivity(), "id");
+        mToken = SharedPreferencesHandler.getString(getActivity(), Constant.TOKEN);
+        mUsername = SharedPreferencesHandler.getString(getActivity(), Constant.USER_NAME);
 
         mCircleImageView = (CircleImageView) view.findViewById(R.id.circleImageView);
         mTvHoTen = (TextView) view.findViewById(R.id.tv_ho_ten);
@@ -135,7 +131,7 @@ public class UserFrag extends Fragment {
     }
 
     public void layThongTinCaNhan() {
-        ConnectServer.getInstance(getActivity()).getApi().layThongTinNguoiDung(mCookies, mIdNguoiDung).enqueue(new Callback<UserAcc>() {
+        ConnectServer.getInstance(getActivity()).getApi().layThongTinNguoiDung(mToken, mUsername).enqueue(new Callback<UserAcc>() {
             @Override
             public void onResponse(Call<UserAcc> call, @NonNull Response<UserAcc> response) {
 
@@ -180,10 +176,10 @@ public class UserFrag extends Fragment {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
         alertBuilder.setTitle("Xác nhận đăng xuất")
                 .setMessage("Bạn có chắc chắn đăng xuất tài khoản ra khỏi chương trình")
-                .setNeutralButton("Đồng ý", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Đồng ý", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        ConnectServer.getInstance(getActivity()).getApi().dangXuat(mCookies).enqueue(new Callback<Message>() {
+                        ConnectServer.getInstance(getActivity()).getApi().dangXuat(mToken, mUsername).enqueue(new Callback<Message>() {
                             @Override
                             public void onResponse(Call<Message> call, Response<Message> response) {
                                 if (response.isSuccessful()) {
@@ -199,7 +195,7 @@ public class UserFrag extends Fragment {
                         });
                     }
                 })
-                .setNeutralButton("Hủy",null);
+                .setPositiveButton("Hủy", null);
 
         mAlertDialog = alertBuilder.create();
         mAlertDialog.show();

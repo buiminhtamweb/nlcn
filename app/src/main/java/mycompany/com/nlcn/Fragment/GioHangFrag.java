@@ -49,7 +49,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     private AlertDialog mAlertDialog;
     private API api;
     private Button mBtnDatHang;
-    private String mCookies;
+    private String mToken;
     private ProgressDialog mProgressDialog;
 
 
@@ -57,7 +57,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_giohang, container, false);
-        mCookies = SharedPreferencesHandler.getString(getActivity(), Constant.PREF_COOKIES);
+        mToken = SharedPreferencesHandler.getString(getActivity(), Constant.TOKEN);
         idNguoiDung = SharedPreferencesHandler.getString(getActivity(), "id");
         Log.e("ID_User", "onCreateView: ID NGười Dùng: " + idNguoiDung);
 
@@ -82,7 +82,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
 
         api = ConnectServer.getInstance(getActivity()).getApi();
 
-        api.layGioHang(mCookies, idNguoiDung).enqueue(new Callback<List<SPGioHang>>() {
+        api.layGioHang(mToken).enqueue(new Callback<List<SPGioHang>>() {
             @Override
             public void onResponse(Call<List<SPGioHang>> call, Response<List<SPGioHang>> response) {
                 mGioHang.clear();
@@ -130,7 +130,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
             donHang.setSpMua(spMuas);
             donHang.setTongTien(Integer.parseInt(mTvTongTien.getText().toString()));
 
-            ConnectServer.getInstance(getActivity()).getApi().datHang(mCookies, donHang).enqueue(new Callback<Message>() {
+            ConnectServer.getInstance(getActivity()).getApi().datHang(mToken, donHang).enqueue(new Callback<Message>() {
                 @Override
                 public void onResponse(Call<Message> call, Response<Message> response) {
 
@@ -205,7 +205,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
             @Override
             public void onClick(DialogInterface dialogInterface, final int i) {
 
-                api.xoaSPGioHang(mCookies, idSanPham, idNguoiDung).enqueue(new Callback<Message>() {
+                api.xoaSPGioHang(mToken, idSanPham).enqueue(new Callback<Message>() {
                     @Override
                     public void onResponse(Call<Message> call, Response<Message> response) {
 
@@ -270,7 +270,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
             public void onClick(View view) {
 
                 final int sanLuongMua = Integer.parseInt(edtSanLuong.getText().toString());
-                api.capNhatSanLuongMuaSP(mCookies, idSanPham, idNguoiDung, sanLuongMua).enqueue(new Callback<Message>() {
+                api.capNhatSanLuongMuaSP(mToken, idSanPham, sanLuongMua).enqueue(new Callback<Message>() {
                     @Override
                     public void onResponse(Call<Message> call, Response<Message> response) {
                         if (null != response.body() && response.code() == 200) {
