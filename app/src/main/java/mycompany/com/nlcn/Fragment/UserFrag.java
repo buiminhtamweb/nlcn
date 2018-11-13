@@ -183,6 +183,8 @@ public class UserFrag extends Fragment {
                             @Override
                             public void onResponse(Call<Message> call, Response<Message> response) {
                                 if (response.isSuccessful()) {
+                                    SharedPreferencesHandler.writeString(getContext(), Constant.TOKEN, "");
+
                                     Snackbar.make(mCircleImageView, response.body().getMessage(), Snackbar.LENGTH_LONG).show();
                                     startActivity(new Intent(getActivity(), LoginActivity.class));
                                 }

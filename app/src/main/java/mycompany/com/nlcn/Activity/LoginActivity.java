@@ -168,7 +168,8 @@ public class LoginActivity extends AppCompatActivity {
             String messsage = bundle.getString("message", null);
             if (messsage != null) {
                 viewError(messsage);
-            } else if (SharedPreferencesHandler.getBoolean(mContext, "remember_me")) {
+            } else if (SharedPreferencesHandler.getBoolean(mContext, "remember_me") &&
+                    SharedPreferencesHandler.getString(mContext, Constant.TOKEN).equals("")) {
 //                kiemTraDangNhap();
                 startActivity(new Intent(this, MainActivity.class));
             }
