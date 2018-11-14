@@ -16,4 +16,5 @@
 
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="err_connect_to_server">Lỗi kết nối đến máy chủ!</string>
 </resources>

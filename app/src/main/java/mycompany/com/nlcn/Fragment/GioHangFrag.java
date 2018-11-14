@@ -41,7 +41,6 @@ import retrofit2.Response;
 
 public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.onClickListener, View.OnClickListener {
 
-    String idNguoiDung = "";
     private RecyclerView mRecyclerView;
     private List<SPGioHang> mGioHang = new ArrayList<>();
     private GioHangRecyclerViewAdapter mGioHangRecyclerViewAdapter;
@@ -58,8 +57,6 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_giohang, container, false);
         mToken = SharedPreferencesHandler.getString(getActivity(), Constant.TOKEN);
-        idNguoiDung = SharedPreferencesHandler.getString(getActivity(), "id");
-        Log.e("ID_User", "onCreateView: ID NGười Dùng: " + idNguoiDung);
 
         mBtnDatHang = (Button) view.findViewById(R.id.btn_dathang);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
@@ -93,7 +90,15 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
                     getActivity().finish();
                 }
 
-                if (response.isSuccessful() && null != response.body()) {
+                if (response.code() == 400) {
+                    try {
+                        viewSucc(mRecyclerView, response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (response.code() == 200 && null != response.body()) {
                     for (int i = 0; i < response.body().size(); i++) {
 
                         mGioHang.add(response.body().get(i));
@@ -126,7 +131,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
                 spMuas.add(spMua);
             }
             DonHang donHang = new DonHang();
-            donHang.setIdNguoiMua(idNguoiDung);
+//            donHang.setIdNguoiMua(idNguoiDung);
             donHang.setSpMua(spMuas);
             donHang.setTongTien(Integer.parseInt(mTvTongTien.getText().toString()));
 

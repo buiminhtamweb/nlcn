@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -106,7 +107,7 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
 
                 if (response.code() == 400) {
                     try {
-                        viewError(response.errorBody().string());
+                        viewSucc(mRecyclerView, response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -185,7 +186,16 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
                         ConnectServer.getInstance(getBaseContext()).getApi().layItemSPDonHang(mToken, spMua.getIdSpMua()).enqueue(new Callback<ItemSPDonHang>() {
                             @Override
                             public void onResponse(Call<ItemSPDonHang> call, Response<ItemSPDonHang> response) {
-                                if (null != response.body()) {
+
+                                if (response.code() == 400) {
+                                    try {
+                                        viewSucc(mRecyclerView, response.errorBody().string());
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                if (response.code() == 200 && null != response.body()) {
                                     ItemSanpham itemSanpham = new ItemSanpham();
                                     itemSanpham.setId(spMua.getIdSpMua());
                                     itemSanpham.setSanluong(spMua.getSanLuongMua());
@@ -196,6 +206,7 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
                                     recyAgriOrderAdapter.notifyDataSetChanged();
                                 }
                             }
+
 
                             @Override
                             public void onFailure(Call<ItemSPDonHang> call, Throwable t) {
@@ -240,6 +251,11 @@ public class LichSuDatHangActivity extends AppCompatActivity implements DonHangR
             finish();
         }
 
+    }
+
+    private void viewSucc(View view, String message) {
+        Snackbar mSnackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT);
+        mSnackbar.show();
     }
 
     private void viewError(String message) {

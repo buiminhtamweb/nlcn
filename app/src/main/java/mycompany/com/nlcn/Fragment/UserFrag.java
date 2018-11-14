@@ -27,7 +27,6 @@ import mycompany.com.nlcn.Activity.LichSuDatHangActivity;
 import mycompany.com.nlcn.Activity.LoginActivity;
 import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Data.ConnectServer;
-import mycompany.com.nlcn.Model.Message;
 import mycompany.com.nlcn.Model.UserAcc;
 import mycompany.com.nlcn.R;
 import mycompany.com.nlcn.utils.SharedPreferencesHandler;
@@ -120,11 +119,11 @@ public class UserFrag extends Fragment {
 
     private void phanHoi() {
         try {
-            Intent intent = new Intent (Intent.ACTION_VIEW , Uri.parse("mailto:" + "tamb1401088@student.ctu.edu.vn"));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + "tamb1401088@student.ctu.edu.vn"));
             intent.putExtra(Intent.EXTRA_SUBJECT, "Phản hồi ứng dụng Niên luận chuyên ngành");
             intent.putExtra(Intent.EXTRA_TEXT, "");
             startActivity(intent);
-        } catch(Exception e) {
+        } catch (Exception e) {
             viewError("Máy của bạn chưa cài đặt ứng dụng gửi Email !");
             e.printStackTrace();
         }
@@ -179,22 +178,9 @@ public class UserFrag extends Fragment {
                 .setNegativeButton("Đồng ý", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        ConnectServer.getInstance(getActivity()).getApi().dangXuat(mToken, mUsername).enqueue(new Callback<Message>() {
-                            @Override
-                            public void onResponse(Call<Message> call, Response<Message> response) {
-                                if (response.isSuccessful()) {
-                                    SharedPreferencesHandler.writeString(getContext(), Constant.TOKEN, "");
-
-                                    Snackbar.make(mCircleImageView, response.body().getMessage(), Snackbar.LENGTH_LONG).show();
-                                    startActivity(new Intent(getActivity(), LoginActivity.class));
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Message> call, Throwable t) {
-
-                            }
-                        });
+                        SharedPreferencesHandler.writeString(getContext(), Constant.TOKEN, "");
+                        Snackbar.make(mCircleImageView, "Đã đăng xuất", Snackbar.LENGTH_SHORT).show();
+                        startActivity(new Intent(getActivity(), LoginActivity.class));
                     }
                 })
                 .setPositiveButton("Hủy", null);
@@ -264,7 +250,7 @@ public class UserFrag extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        if(mAlertDialog != null && mAlertDialog.isShowing()){
+        if (mAlertDialog != null && mAlertDialog.isShowing()) {
             mAlertDialog.cancel();
         }
     }

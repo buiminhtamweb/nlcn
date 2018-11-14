@@ -52,9 +52,6 @@ public interface API {
                              @Field("username") String username,
                              @Field("password") String password);
 
-//    @GET("checkTrangThai")
-//    Call<Message> kiemTraTrangThaiDangNhap(@Header("Authorization") String token);
-
     @GET("users/{username}")
     Call<UserAcc> layThongTinNguoiDung(@Header("Authorization") String token,
                                        @Path("username") String username);
@@ -73,29 +70,25 @@ public interface API {
                                  @Field("matKhauCu") String matKhauCu,
                                  @Field("matKhauMoi") String matKhauMoi);
 
-    @POST("users/{username}/logout")
-    Call<Message> dangXuat(@Header("Authorization") String token,
-                           @Path("username") String username);
-
 
     //Giỏ hàng
     @FormUrlEncoded
-    @POST("giohangs")
+    @POST("giohang")
     Call<Message> themSPVaoGioHang(@Header("Authorization") String token,
                                    @Field("idSanPham") String idSanPham,
                                    @Field("sanLuongMua") int sanLuongMua);
 
-    @GET("giohangs")
+    @GET("giohang")
     Call<List<SPGioHang>> layGioHang(@Header("Authorization") String token);
 
     @FormUrlEncoded
-    @PUT("giohangs/{idSanPham}")
+    @PUT("giohang/{idSanPham}")
     Call<Message> capNhatSanLuongMuaSP(@Header("Authorization") String token,
                                        @Path("idSanPham") String idSanPham,
                                        @Field("sanLuongMua") int sanLuongMua);
 
 
-    @DELETE("giohangs/{idSanPham}")
+    @DELETE("giohang/{idSanPham}")
     Call<Message> xoaSPGioHang(@Header("Authorization") String token,
                                @Path("idSanPham") String idSanPham
     );

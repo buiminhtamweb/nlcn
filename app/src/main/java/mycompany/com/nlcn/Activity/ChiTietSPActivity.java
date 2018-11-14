@@ -62,6 +62,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
         if (toolbar != null) {
             toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
             setSupportActionBar(toolbar);
+            toolbar.setTitle("Chi tiết sản phẩm");
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -179,7 +180,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
                             @Override
                             public void onFailure(Call<Message> call, Throwable t) {
                                 mAlertDialog.dismiss();
-                                viewError("Lỗi kết nối đến máy chủ!");
+                                viewError(getString(R.string.err_connect_to_server));
                             }
                         });
             }
@@ -192,7 +193,7 @@ public class ChiTietSPActivity extends AppCompatActivity {
 
 
     private void viewError(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Cảnh báo");
         builder.setMessage(message);
         builder.setCancelable(false);

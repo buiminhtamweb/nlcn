@@ -47,7 +47,6 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
     private int mNumPage;
     private API mApi;
     private AlertDialog mAlertDialog;
-    private String mUsername = "";
     private String mToken;
     private TextView mTvSearch;
 
@@ -56,9 +55,17 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.frag_home, container, false);
 
-        mToken = SharedPreferencesHandler.getString(getActivity(), Constant.TOKEN);
-        mUsername = SharedPreferencesHandler.getString(getActivity(), Constant.USER_NAME);
+        initView(v);
 
+        mToken = SharedPreferencesHandler.getString(getActivity(), Constant.TOKEN);
+        mApi = ConnectServer.getInstance(getContext()).getApi();
+
+        layDSSanPham(1);
+
+        return v;
+    }
+
+    private void initView(View v) {
         mTvSearch = v.findViewById(R.id.tv_seach);
         mTvSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,12 +83,6 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mSanPhamRecyclerViewAdapter);
-
-        mApi = ConnectServer.getInstance(getContext()).getApi();
-
-        layDSSanPham(1);
-
-        return v;
     }
 
     private void layDSSanPham(int page) {
@@ -92,6 +93,7 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
             @Override
             public void onResponse(Call<DataSanPham> call, Response<DataSanPham> response) {
                 if (null != response.body() && response.code() == 200) {
+
                     mPageCurrent = Integer.parseInt(response.body().getPage());
                     mNumPage = response.body().getNumpages();
 
@@ -100,7 +102,7 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
 
                     }
                     mSanPhamRecyclerViewAdapter.notifyDataSetChanged();
-                    Log.e("HOME_FRAG", "onResponse: Succ");
+                    Log.e("HOME_FRAG", "onResponse: layDSSanPham Succ");
                 }
                 if (response.code() == 400) {
                     try {

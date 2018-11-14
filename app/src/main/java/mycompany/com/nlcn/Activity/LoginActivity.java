@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import java.io.IOException;
+
 import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Data.ConnectServer;
 import mycompany.com.nlcn.MainActivity;
@@ -64,36 +66,42 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<ResLogin> call, Response<ResLogin> response) {
                     hideProgressDialog();
-                    try {
-                        if (response.body().getSERVERRESPONSE() == 1) {
 
-                            if (mCBRememberMe.isChecked()) {
-
-                                SharedPreferencesHandler.writeString(mContext, Constant.USER_NAME, mEdtUserName.getText().toString());
-//                                SharedPreferencesHandler.writeString(mContext, Constant.PASSWORD, mEdtPassword.getText().toString());
-                                SharedPreferencesHandler.writeBoolean(mContext, "remember_me", true);
-
-                            }
-
-
-                            Log.e("LOGIN", "onResponse: TOKEN: " + response.body().getTOKEN());
-
-
-                            viewSucc(mCBRememberMe, "Đã đăng nhập thành công");
-                            SharedPreferencesHandler.writeString(mContext, Constant.USER_NAME, mEdtUserName.getText().toString());
-                            SharedPreferencesHandler.writeString(mContext, Constant.TOKEN, response.body().getTOKEN());
-                            Intent i = new Intent(mContext, MainActivity.class);
-                            startActivity(i);
-                            finish();
-                        } else if (response.body().getSERVERRESPONSE() == 0) {
-
-                            viewError(response.body().getSERVERMESSAGE());
-
-                            v.setEnabled(true);
+                    if (response.code() == 400) {
+                        try {
+                            viewError(response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } catch (NullPointerException e) {
-                        Log.e("TAG", "onResponse: " + "response null");
                     }
+
+                    if (response.code() == 200 && response.body().getSERVERRESPONSE() == 1) {
+
+                        if (mCBRememberMe.isChecked()) {
+
+                            SharedPreferencesHandler.writeString(mContext, Constant.USER_NAME, mEdtUserName.getText().toString());
+//                                SharedPreferencesHandler.writeString(mContext, Constant.PASSWORD, mEdtPassword.getText().toString());
+                            SharedPreferencesHandler.writeBoolean(mContext, "remember_me", true);
+
+                        }
+
+
+                        Log.e("LOGIN", "onResponse: TOKEN: " + response.body().getTOKEN());
+
+
+                        viewSucc(mCBRememberMe, "Đã đăng nhập thành công");
+                        SharedPreferencesHandler.writeString(mContext, Constant.USER_NAME, mEdtUserName.getText().toString());
+                        SharedPreferencesHandler.writeString(mContext, Constant.TOKEN, "Bearer " + response.body().getTOKEN());
+                        Intent i = new Intent(mContext, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                    } else if (response.code() == 200 && response.body().getSERVERRESPONSE() == 0) {
+
+                        viewError(response.body().getSERVERMESSAGE());
+
+                        v.setEnabled(true);
+                    }
+
 
                 }
 
@@ -168,9 +176,14 @@ public class LoginActivity extends AppCompatActivity {
             String messsage = bundle.getString("message", null);
             if (messsage != null) {
                 viewError(messsage);
-            } else if (SharedPreferencesHandler.getBoolean(mContext, "remember_me") &&
-                    SharedPreferencesHandler.getString(mContext, Constant.TOKEN).equals("")) {
-//                kiemTraDangNhap();
+            }
+        } else {
+            boolean remember_me = SharedPreferencesHandler.getBoolean(mContext, "remember_me");
+            String token = SharedPreferencesHandler.getString(mContext, Constant.TOKEN);
+
+            Log.e("LOGIN", "onStart: " + remember_me + token);
+
+            if (remember_me && !token.equals("")) {
                 startActivity(new Intent(this, MainActivity.class));
             }
         }
@@ -203,8 +216,8 @@ public class LoginActivity extends AppCompatActivity {
         mSnackbar.show();
     }
 
-    private void viewProgressDialog(String message){
-        if(null == mProgressDialog ) {
+    private void viewProgressDialog(String message) {
+        if (null == mProgressDialog) {
             mProgressDialog = new ProgressDialog(this);
         }
         mProgressDialog.setMessage(message);
@@ -212,8 +225,8 @@ public class LoginActivity extends AppCompatActivity {
         mProgressDialog.show();
     }
 
-    private void hideProgressDialog(){
-        if(null != mProgressDialog ){
+    private void hideProgressDialog() {
+        if (null != mProgressDialog) {
             mProgressDialog.dismiss();
         }
     }
