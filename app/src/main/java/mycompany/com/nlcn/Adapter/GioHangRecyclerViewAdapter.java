@@ -19,6 +19,7 @@ import java.util.List;
 import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Model.SPGioHang;
 import mycompany.com.nlcn.R;
+import mycompany.com.nlcn.utils.Number;
 
 public class GioHangRecyclerViewAdapter extends RecyclerView.Adapter<GioHangRecyclerViewAdapter.Holder> {
     private Context mContext;
@@ -44,8 +45,8 @@ public class GioHangRecyclerViewAdapter extends RecyclerView.Adapter<GioHangRecy
 
         Picasso.get().load(Constant.URL_SERVER + mGioHang.get(position).getImgurl()).fit().centerCrop().into(holder.imageView);
         holder.nameAgri.setText(mGioHang.get(position).getTensp());
-        holder.price.setText("Giá: " + mGioHang.get(position).getGiasp() + " VND");
-        holder.sanLuong.setText("Tồn kho: " + mGioHang.get(position).getSanluong() + " Gam");
+        holder.price.setText("Giá: " + Number.convertNumber(mGioHang.get(position).getGiasp()) + " VND");
+        holder.sanLuong.setText("Tồn kho: " + Number.convertNumber(mGioHang.get(position).getSanluong()) + " Gam");
         holder.sanLuongMua.setText("" + mGioHang.get(position).getSanLuongMua());
     }
 
@@ -71,7 +72,7 @@ public class GioHangRecyclerViewAdapter extends RecyclerView.Adapter<GioHangRecy
 
         void onItemDeleteClick(int position, String idSanPham);
 
-        void onEditTextClick(int positon, String idSanPham);
+        void onEditTextClick(int positon, String idSanPham, String tenSanPham, int sanLuongMua);
     }
 
     class Holder extends RecyclerView.ViewHolder {
@@ -106,7 +107,10 @@ public class GioHangRecyclerViewAdapter extends RecyclerView.Adapter<GioHangRecy
                 @Override
                 public void onClick(View view) {
                     int position = getAdapterPosition();
-                    onClickListener.onEditTextClick(position, mGioHang.get(position).getIdSpMua());
+                    onClickListener.onEditTextClick(position,
+                            mGioHang.get(position).getIdSpMua(),
+                            mGioHang.get(position).getTensp(),
+                            mGioHang.get(position).getSanLuongMua());
                 }
             });
 

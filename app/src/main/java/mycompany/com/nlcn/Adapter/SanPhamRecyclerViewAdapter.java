@@ -17,6 +17,7 @@ import java.util.List;
 import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Model.ItemSanpham;
 import mycompany.com.nlcn.R;
+import mycompany.com.nlcn.utils.Number;
 
 public class SanPhamRecyclerViewAdapter extends RecyclerView.Adapter<SanPhamRecyclerViewAdapter.Holder> {
     private Context mContext;
@@ -47,8 +48,10 @@ public class SanPhamRecyclerViewAdapter extends RecyclerView.Adapter<SanPhamRecy
         Picasso.get().load(Constant.URL_SERVER + mSanPhams.get(position).getImgurl()).fit().centerCrop().into(holder.mImageView);
 
         holder.mNameAgri.setText(mSanPhams.get(position).getTensp());
-        holder.mPrice.setText(mSanPhams.get(position).getGiasp() + " VND");
-        holder.mSanLuong.setText(mSanPhams.get(position).getSanluong() + " Gam");
+
+
+        holder.mPrice.setText(Number.convertNumber(mSanPhams.get(position).getGiasp()) + " VND/Kg");
+        holder.mSanLuong.setText(Number.convertNumber(mSanPhams.get(position).getSanluong()) + " Gam");
 
         onScrollListener.onScroll(position);
     }
@@ -76,6 +79,7 @@ public class SanPhamRecyclerViewAdapter extends RecyclerView.Adapter<SanPhamRecy
         void onScroll(int position);
     }
 
+
     class Holder extends RecyclerView.ViewHolder {
 
         ImageView mImageView;
@@ -88,8 +92,8 @@ public class SanPhamRecyclerViewAdapter extends RecyclerView.Adapter<SanPhamRecy
             super(view);
             mImageView = (ImageView) view.findViewById(R.id.imageView);
             mNameAgri = (TextView) view.findViewById(R.id.textView_tensp);
-            mSanLuong = (TextView) view.findViewById(R.id.textView_giasp);
-            mPrice = (TextView) view.findViewById(R.id.textView_sanluong);
+            mSanLuong = (TextView) view.findViewById(R.id.textView_sanluong);
+            mPrice = (TextView) view.findViewById(R.id.textView_giasp);
             imageButton = (ImageButton) view.findViewById(R.id.imageButton);
 
 

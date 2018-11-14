@@ -17,6 +17,7 @@ import java.util.List;
 import mycompany.com.nlcn.Constant;
 import mycompany.com.nlcn.Model.ItemSanpham;
 import mycompany.com.nlcn.R;
+import mycompany.com.nlcn.utils.Number;
 
 public class SPDonHangRecyclerViewAdapter extends RecyclerView.Adapter<SPDonHangRecyclerViewAdapter.Holder> {
     private onClickListener onClickListener;
@@ -42,8 +43,8 @@ public class SPDonHangRecyclerViewAdapter extends RecyclerView.Adapter<SPDonHang
         Log.e("Adapter", "onBindViewHolder: "+  mSanPhams.get(position).getImgurl() );
         Picasso.get().load(Constant.URL_SERVER + mSanPhams.get(position).getImgurl()).fit().centerCrop().into(holder.mImageView);
         holder.mNameAgri.setText(mSanPhams.get(position).getTensp());
-        holder.tongTien.setText("Giá mua: " + mSanPhams.get(position).getGiasp() + " VND");
-        holder.mSanLuong.setText("Sản lượng mua: " + mSanPhams.get(position).getSanluong() + " Gam");
+        holder.tongTien.setText("Giá mua: " + Number.convertNumber(mSanPhams.get(position).getGiasp()) + " VND");
+        holder.mSanLuong.setText("Sản lượng mua: " + Number.convertNumber(mSanPhams.get(position).getSanluong()) + " Gam");
 
     }
 

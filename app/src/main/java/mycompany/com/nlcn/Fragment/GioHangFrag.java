@@ -34,6 +34,7 @@ import mycompany.com.nlcn.Model.Message;
 import mycompany.com.nlcn.Model.SPGioHang;
 import mycompany.com.nlcn.Model.SpMua;
 import mycompany.com.nlcn.R;
+import mycompany.com.nlcn.utils.Number;
 import mycompany.com.nlcn.utils.SharedPreferencesHandler;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -84,7 +85,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
             public void onResponse(Call<List<SPGioHang>> call, Response<List<SPGioHang>> response) {
                 mGioHang.clear();
                 if (response.code() == 401) {
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    Intent intent = new Intent(getContext(), LoginActivity.class);
                     intent.putExtra("message", "Phiên làm việc hết hạn \n Vui lòng đăng nhập lại");
                     startActivity(intent);
                     getActivity().finish();
@@ -106,7 +107,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
                     }
 
                     mGioHangRecyclerViewAdapter.notifyDataSetChanged();
-                    mTvTongTien.setText(mGioHangRecyclerViewAdapter.getTongTien() + "");
+                    mTvTongTien.setText(Number.convertNumber(mGioHangRecyclerViewAdapter.getTongTien()) + "");
                 }
 
             }
@@ -133,7 +134,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
             DonHang donHang = new DonHang();
 //            donHang.setIdNguoiMua(idNguoiDung);
             donHang.setSpMua(spMuas);
-            donHang.setTongTien(Integer.parseInt(mTvTongTien.getText().toString()));
+            donHang.setTongTien(mGioHangRecyclerViewAdapter.getTongTien());
 
             ConnectServer.getInstance(getActivity()).getApi().datHang(mToken, donHang).enqueue(new Callback<Message>() {
                 @Override
@@ -225,7 +226,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
                             viewSucc(mTvTongTien, response.body().getMessage());
                             mGioHang.remove(position);
                             mGioHangRecyclerViewAdapter.notifyDataSetChanged();
-                            mTvTongTien.setText("" + mGioHangRecyclerViewAdapter.getTongTien());
+                            mTvTongTien.setText("" + Number.convertNumber(mGioHangRecyclerViewAdapter.getTongTien()));
                             mAlertDialog.dismiss();
                         }
                         if (response.code() == 400) {
@@ -253,7 +254,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
     }
 
     @Override
-    public void onEditTextClick(final int position, final String idSanPham) {
+    public void onEditTextClick(final int position, final String idSanPham, String tenSanPham, int sanLuongMua) {
         //Ver2
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
 
@@ -262,6 +263,8 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
         Button btnXacNhan = dialogView.findViewById(R.id.btn_xacnhan);
         Button btnHuy = dialogView.findViewById(R.id.btn_huy);
         final EditText edtSanLuong = dialogView.findViewById(R.id.edt_sanluongmua);
+
+        edtSanLuong.setText(sanLuongMua + "");
 
         btnHuy.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -284,7 +287,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
                                 viewSucc(mTvTongTien, "Đã cập nhật thành công");
                                 mGioHang.get(position).setSanLuongMua(sanLuongMua);
                                 mGioHangRecyclerViewAdapter.notifyDataSetChanged();
-                                mTvTongTien.setText("" + mGioHangRecyclerViewAdapter.getTongTien());
+                            mTvTongTien.setText("" + Number.convertNumber(mGioHangRecyclerViewAdapter.getTongTien()));
                                 mAlertDialog.dismiss();
 
                         }
@@ -308,7 +311,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
         });
 
         dialogBuilder.setView(dialogView);
-        dialogBuilder.setTitle("Cập nhật sản lượng mua");
+        dialogBuilder.setTitle("Cập nhật " + tenSanPham);
         mAlertDialog = dialogBuilder.create();
         mAlertDialog.show();
 
