@@ -160,7 +160,7 @@ public class DonHangDangXyLyActivity extends AppCompatActivity implements DonHan
         });
 
         Button btnHuy = (Button) dialogView.findViewById(R.id.btn_close);
-        dialogBuilder.setTitle("Danh sách nông sản đang xử lý");
+        dialogBuilder.setTitle("Đơn hàng đang xử lý");
 
         final TextView tvIDDonHang = (TextView) dialogView.findViewById(R.id.textView_id_don_hang);
 //        TextView tvSoLuongSPMua = (TextView) dialogView.findViewById(R.id.textView_so_luong_sp_mua);

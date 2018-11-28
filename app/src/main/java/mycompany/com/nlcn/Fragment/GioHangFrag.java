@@ -153,7 +153,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
 
                         mGioHang.clear(); //Xóa các dữ liệu trong giỏ hàng
                         mGioHangRecyclerViewAdapter.notifyDataSetChanged();
-
+                        mTvTongTien.setText("" + Number.convertNumber(mGioHangRecyclerViewAdapter.getTongTien()));
                         viewSucc(mTvTongTien, response.body().getMessage());
 
 
@@ -246,8 +246,7 @@ public class GioHangFrag extends Fragment implements GioHangRecyclerViewAdapter.
 
             }
         });
-        builderDialog.setNeutralButton("Hủy", null);
-        builderDialog.setTitle("Cập nhật sản lượng mua");
+        builderDialog.setPositiveButton("Hủy", null);
         mAlertDialog = builderDialog.create();
         mAlertDialog.show();
 

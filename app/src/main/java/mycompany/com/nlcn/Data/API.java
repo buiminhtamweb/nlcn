@@ -104,11 +104,11 @@ public interface API {
 
     @GET("donhangs/{idDonHang}")
     Call<DonHangRes> layChiTietDonHang(@Header("Authorization") String token,
-                                       @Query("idDonHang") String idDonHang);
+                                       @Path("idDonHang") String idDonHang);
 
     @GET("sanphams/{idSanPham}/item")
     Call<ItemSPDonHang> layItemSPDonHang(@Header("Authorization") String token,
-                                         @Query("idSanPham") String idSanPham);
+                                         @Path("idSanPham") String idSanPham);
 
 
 }

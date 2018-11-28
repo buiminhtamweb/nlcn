@@ -60,7 +60,7 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
         mToken = SharedPreferencesHandler.getString(getActivity(), Constant.TOKEN);
         mApi = ConnectServer.getInstance(getContext()).getApi();
 
-        layDSSanPham(1);
+//        layDSSanPham(1);
 
         return v;
     }
@@ -238,5 +238,11 @@ public class HomeFrag extends Fragment implements SanPhamRecyclerViewAdapter.onS
         snackbar.show();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mSanPhams.clear();
+        layDSSanPham(1);
 
+    }
 }
